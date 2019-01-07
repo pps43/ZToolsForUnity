@@ -10,6 +10,7 @@ namespace ZTools.Debug
     /// </summary>
     public class FPS : MonoBehaviour
     {
+        public int targetFrameRate = 60;
         public TextMesh textArea;
         public Text text;
         [SerializeField] private float _updateInterval = 0.5f; // seconds
@@ -20,7 +21,7 @@ namespace ZTools.Debug
 
         private void Awake()
         {
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = targetFrameRate;
         }
 
         void Update()
