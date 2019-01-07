@@ -12,14 +12,14 @@ namespace ZTools.Debug
     /// <summary>
     /// Use LogFilter to do filename-based filtering.
     /// Use Zlog.logLevel to do importance-based filtering.
+    /// Modity _line, _filePath according to your project before use.
     /// </summary>
-    public class Log
+    public class ZLog
     {
         public static bool isLogOn = true; // swith on/off
         public static LogLevel logLevel = LogLevel.info;
-
         private static int _line = 176;// Must be the line number of "UnityEngine.Debug.Log" in this file.
-
+        private static string _filePath = "Assets/ZTools/Debug/Log/LogUtil.cs";//Modify to your actual path
         public enum LogLevel
         {
             verbose,
@@ -191,9 +191,9 @@ namespace ZTools.Debug
         private static FieldInfo _logEntryConditionFieldInfo;
         private static FieldInfo _consoleWindowFieldInfo;
         private static FieldInfo _listViewFieldInfo;
-        static Log()
+        static ZLog()
         {
-            _instanceID = AssetDatabase.LoadAssetAtPath<MonoScript>("Assets/Script/Util/Debug/LogUtil.cs").GetInstanceID();
+            _instanceID = AssetDatabase.LoadAssetAtPath<MonoScript>(_filePath).GetInstanceID();
             _logStackFrames.Clear();
 
             getConsoleWindowListView();
