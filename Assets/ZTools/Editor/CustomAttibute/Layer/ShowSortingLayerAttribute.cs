@@ -1,6 +1,11 @@
 ﻿using UnityEngine;
 
-//仅用于展示 SortingLayer 类对象
+/// <summary>
+/// Select sortinglayer in your script
+/// e.g. 
+/// [ShowSortingLayer] [SerializeField] private string renderLayer = "";
+/// gameobject.layer = layer;
+/// </summary>
 public class ShowSortingLayerAttribute : PropertyAttribute
 {
 }
