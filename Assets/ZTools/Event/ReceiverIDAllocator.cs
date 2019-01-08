@@ -4,10 +4,9 @@ using UnityEngine;
 namespace ZTools.Event
 {
     /// <summary>
-    /// ID generator
-    /// 
+    /// ID generator used by eventsystem
     /// </summary>
-    public static class IDAllocator
+    public static class ReceiverIDAllocator
     {
         public const int GLOBALID = 0;
         private static long _curAvaliableID = 1;
@@ -19,9 +18,6 @@ namespace ZTools.Event
             _curAvaliableID += 1;
             return result;
         }
-        public static void returnID(long id)
-        {
-            //todo 归还id
-        }
+        
     }
 }

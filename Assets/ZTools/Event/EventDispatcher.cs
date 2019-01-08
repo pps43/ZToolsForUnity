@@ -1,14 +1,10 @@
 ﻿using System.Collections.Generic;
 namespace ZTools.Event
 {
-
     public delegate bool EventHandler(CommonEvent eventObj);
 
-
     /// <summary>
-    /// 消息转发单例
-    /// 只能通过 createInstance或访问instance，不可以直接创建实例
-    /// 销毁实例采用 destroyInstance，防止泄露
+    /// Use createInstance/destroyInstance rather than new()
     /// 需要外部驱动 Update
     /// </summary>
     public class EventDispatcher
@@ -24,10 +20,9 @@ namespace ZTools.Event
             }
         }
 
-        public bool isLocked;//消息锁
+        public bool isLocked;
         List<CommonEvent> _cachedEvents;
-        Dictionary<CommonEvent.ID, List<EventHandlerWithID>> _allHandlers;
-
+        Dictionary<EventID, List<EventHandlerWithID>> _allHandlers;
 
         #region 单例
         private static EventDispatcher _instance;
@@ -48,7 +43,7 @@ namespace ZTools.Event
             isLocked = false;
             _cachedEvents = new List<CommonEvent>();
             //传入 EventIDComparer， 去除Enum作为Key的Boxing、UnBoxing，消除GC
-            _allHandlers = new Dictionary<CommonEvent.ID, List<EventHandlerWithID>>(new EventIDComparer());
+            _allHandlers = new Dictionary<EventID, List<EventHandlerWithID>>(new EventIDComparer());
         }
         public static EventDispatcher createInstance()
         {
@@ -65,7 +60,7 @@ namespace ZTools.Event
         /// <summary>
         /// 添加监听
         /// </summary>
-        public void addListener(CommonEvent.ID eventID, long receiverID, EventHandler handler)
+        public void addListener(EventID eventID, long receiverID, EventHandler handler)
         {
             if (_allHandlers.ContainsKey(eventID))
             {
@@ -82,7 +77,7 @@ namespace ZTools.Event
         /// <summary>
         /// 移除监听
         /// </summary>
-        public void removeListener(CommonEvent.ID eventID, long receiverID, EventHandler handler)
+        public void removeListener(EventID eventID, long receiverID, EventHandler handler)
         {
             if (_allHandlers.ContainsKey(eventID))
             {
@@ -101,7 +96,7 @@ namespace ZTools.Event
         /// <summary>
         /// 发送消息，下一帧触发响应
         /// </summary>
-        public void fireEvent(CommonEvent.ID eventID, long senderID, long receiverID, object data)
+        public void fireEvent(EventID eventID, long senderID, long receiverID, object data)
         {
             if (senderID == -1 || receiverID == -1)
             {
@@ -139,7 +134,7 @@ namespace ZTools.Event
                 for (int i = 0; i < _cachedEvents.Count; i++)
                 {
                     CommonEvent param = _cachedEvents[i];
-                    var eventID = (CommonEvent.ID)_cachedEvents[i].eventID;
+                    var eventID = (EventID)_cachedEvents[i].eventID;
 
                     if (_allHandlers.ContainsKey(eventID))
                     {
@@ -147,7 +142,7 @@ namespace ZTools.Event
                         {
                             EventHandlerWithID selectedHandlers = _allHandlers[eventID][j];
 
-                            if (param.receiverID == IDAllocator.GLOBALID)//广播消息
+                            if (param.receiverID == ReceiverIDAllocator.GLOBALID)//广播消息
                             {
                                 if (selectedHandlers.handler(param))
                                 {
@@ -183,16 +178,5 @@ namespace ZTools.Event
     }
 
 
-    public class EventIDComparer : IEqualityComparer<CommonEvent.ID>
-    {
-        public bool Equals(CommonEvent.ID x, CommonEvent.ID y)
-        {
-            return x == y;
-        }
-
-        public int GetHashCode(CommonEvent.ID x)
-        {
-            return (int)x;
-        }
-    }
+    
 }
