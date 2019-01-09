@@ -11,6 +11,7 @@ namespace ZTools.Event
         onPauseGame,
         onExitGame,
         onRestartGame,
+        onTurn,// may be used in turn-based game
 
         //add new event type
     }
