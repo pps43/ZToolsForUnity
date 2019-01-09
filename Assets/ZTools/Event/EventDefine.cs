@@ -16,6 +16,9 @@ namespace ZTools.Event
         //add new event type
     }
 
+    /// <summary>
+    /// EventIDComparer is used for eliminating GC caused by Enum as Key
+    /// </summary>
     public class EventIDComparer : IEqualityComparer<EventID>
     {
         public bool Equals(EventID x, EventID y)
