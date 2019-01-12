@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ZTools.Debug;
+using ZTools.DebugUtil;
 
 namespace ZTools.Event
 {

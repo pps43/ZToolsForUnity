@@ -7,7 +7,7 @@ using System.Reflection;
 using System;
 using System.Collections.Generic;
 #endif
-namespace ZTools.Debug
+namespace ZTools.DebugUtil
 {
     /// <summary>
     /// Use LogFilter to do filename-based filtering.

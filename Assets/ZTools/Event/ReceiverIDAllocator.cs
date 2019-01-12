@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-namespace ZTools.Event
+﻿namespace ZTools.Event
 {
     /// <summary>
     /// ID generator used by eventsystem

@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using UnityEditor;
-using UnityEditorInternal;
+﻿using UnityEditor;
 using UnityEngine;
 
 //适用于 [ShowSortingLayer] public string sortingLayer

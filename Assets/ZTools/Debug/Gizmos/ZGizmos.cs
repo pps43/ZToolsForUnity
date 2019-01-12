@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-namespace ZTools.Debug
+﻿using UnityEngine;
+namespace ZTools.DebugUtil
 {
     /// <summary>
     /// draw gizmos with color

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
-namespace ZTools.Debug
+namespace ZTools.DebugUtil
 {
     /// <summary>
     /// print unity log onto screen.

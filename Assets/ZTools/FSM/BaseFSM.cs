@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using ZTools.Debug;
+using ZTools.DebugUtil;
 
 namespace ZTools.FSM
 {

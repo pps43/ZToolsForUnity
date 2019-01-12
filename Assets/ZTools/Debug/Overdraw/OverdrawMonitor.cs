@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary> This is a singleton component that is responsible for measuring overdraw information
 /// on the main camera. You shouldn't add this compoenent manually, but use the Instance getter to

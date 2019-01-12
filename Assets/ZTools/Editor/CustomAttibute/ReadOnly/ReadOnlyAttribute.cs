@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-namespace ZTools.Editor.CustomAttribute
+namespace ZTools.EditorUtil.CustomAttribute
 {
     /// <summary>
     /// use this to make field readonly in editor;
