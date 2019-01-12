@@ -41,6 +41,7 @@ namespace ZTools.EditorUtil.Demo
 
         public bool canEdit = true;
 
+        public string infoStr = "Click it on to enable editing!";
 
 
         public void resetCorrespondType()

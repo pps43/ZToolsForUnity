@@ -11,12 +11,14 @@ namespace ZTools.EditorUtil.CustomInspector
         SerializedProperty selfType;
         SerializedProperty correspondTypes;
         SerializedProperty canEdit;
+        SerializedProperty infoStr;
 
         void OnEnable()
         {
             selfType = serializedObject.FindProperty("_selfType");
             correspondTypes = serializedObject.FindProperty("_correspondType");
             canEdit = serializedObject.FindProperty("canEdit");
+            infoStr = serializedObject.FindProperty("infoStr");
         }
 
         public override void OnInspectorGUI()
@@ -25,9 +27,11 @@ namespace ZTools.EditorUtil.CustomInspector
 
             EditorGUILayout.PropertyField(canEdit);//show selfType using default style
 
+            GUI.enabled = canEdit.boolValue; //disable editing following items, use GUI.enable = true to re-enable.
+
             if (!canEdit.boolValue)
             {
-                GUI.enabled = false; //disable editing following items, use GUI.enable = true to re-enable.
+                EditorGUILayout.LabelField(infoStr.stringValue);//only show if canEdit == false
             }
 
             EditorGUI.BeginChangeCheck(); // detect whether selftype has changed
