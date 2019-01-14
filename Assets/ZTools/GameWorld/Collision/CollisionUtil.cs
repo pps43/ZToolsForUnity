@@ -75,14 +75,18 @@ namespace ZTools.Game.Collision
 
         #region Physics-based method. Need rigidbody and collider.
 
-        #region Casting
+        #region Ray Casting
 
         //if (Physics.Raycast(originPos, dir, out hit, range, layerMask ))
         //{
-            // hit.transform.name  碰到的物体名称
-	        // hit.point  碰撞点
-	        // hit.normal  碰撞点的表面法线（向外）
+        // hit.transform.name  碰到的物体名称
+        // hit.point  碰撞点
+        // hit.normal  碰撞点的表面法线（向外）
         //} 
+
+        #endregion
+
+        #region Shape Casting
 
         #endregion
 
