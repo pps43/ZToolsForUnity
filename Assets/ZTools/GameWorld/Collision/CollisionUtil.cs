@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ZTools.Game.Collision
+namespace ZTools.Game.CollisionUtil
 {
     public class CollisionUtil
     {

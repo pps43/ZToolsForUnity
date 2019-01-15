@@ -1,14 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace ZTools.Game.Collision
+namespace ZTools.Game.CollisionUtil
 {
-    //temp
-    public class CollideAbility
-    {
-
-    }
-
 
     /// <summary>
     /// When 3 object collide in one frame, everyone will receive a collision event.
@@ -19,25 +13,25 @@ namespace ZTools.Game.Collision
     /// Notice, the order of onTriggerEnter function call is random !
     /// 
     /// </summary>
-    public class CollsionManager : MonoBehaviour
+    public class CollisionManager : MonoBehaviour
     {
         internal class CollisionPairInfo
         {
-            public CollisionPairInfo(CollideAbility c1, CollideAbility c2)
+            public CollisionPairInfo(CollisionAbility c1, CollisionAbility c2)
             {
                 _c1 = c1;
                 _c2 = c2;
             }
-            private CollideAbility _c1 = null;
-            private CollideAbility _c2 = null;
+            private CollisionAbility _c1 = null;
+            private CollisionAbility _c2 = null;
 
-            public bool has(CollideAbility c)
+            public bool has(CollisionAbility c)
             {
                 return _c1 == c || _c2 == c;
             }
         }
 
-        private HashSet<CollisionPairInfo> _collisionCache = new HashSet<CollisionPairInfo>();
+        private static HashSet<CollisionPairInfo> _collisionCache = new HashSet<CollisionPairInfo>();
 
         //clear before next frame
         void LateUpdate()
@@ -45,12 +39,19 @@ namespace ZTools.Game.Collision
             _collisionCache.Clear();
         }
 
+        public static bool CanPassTypeTest(CollisionAbility me, CollisionAbility other)
+        {
+            //TODO : use type matrix? or typebitmask?
+
+            return false;
+        }
+
         /// <summary>
         /// c1 and c2 must be in same pair or not recorded at all to return a valid collison
         /// </summary>
-        public bool CanCollideExclusively(CollideAbility c1, CollideAbility c2)
+        public static bool CanPassExclusiveTest(CollisionAbility me, CollisionAbility other)
         {
-            if (c1 == null || c2 == null /*|| c1.abilityOwner == null || c2.abilityOwner == null*/)
+            if (me == null || other == null /*|| c1.abilityOwner == null || c2.abilityOwner == null*/)
             {
                 return false;
             }
@@ -59,9 +60,9 @@ namespace ZTools.Game.Collision
             bool needAdd = true;
             foreach (var pairInfo in _collisionCache)
             {
-                if(pairInfo.has(c1))
+                if(pairInfo.has(me))
                 {
-                    if (!pairInfo.has(c2))
+                    if (!pairInfo.has(other))
                     {
                         ret = false;
                     }
@@ -69,7 +70,7 @@ namespace ZTools.Game.Collision
                 }
                 else
                 {
-                    if(pairInfo.has(c2))
+                    if(pairInfo.has(other))
                     {
                         ret = false;
                         needAdd = false;
@@ -80,7 +81,7 @@ namespace ZTools.Game.Collision
             if(needAdd)
             {
                 //ZLog.verbose("add", c1.abilityOwner.name, ",", c2.abilityOwner.name);
-                _collisionCache.Add(new CollisionPairInfo(c1, c2));
+                _collisionCache.Add(new CollisionPairInfo(me, other));
             }
 
             //if(ret)
