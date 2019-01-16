@@ -10,15 +10,28 @@ namespace ZTools.Game.CollisionUtil
         hero,
         sword,
         enemy,
+        xx,
+        youafoausfoodaf,
     }
 
     /// <summary>
     /// Collision filtering takes 2 step:
-    /// 1. layer and collision matrix defined in settings.
+    /// 1. layer and collision matrix defined in project settings.
     /// 2. this script
     /// </summary>
     public class CollisionAbility : BaseAbility
     {
+
+        /// <summary>
+        /// 2D and 3D cannot collide together.
+        /// </summary>
+        public bool Is2DMode = true;
+
+        /// <summary>
+        /// Turn it on to receive both collison and trigger event.
+        /// </summary>
+        public bool CanReceiveTrigger = true;
+
         /// <summary>
         /// Sometimes when handling a pair of collision,
         /// we want to block out all other collision without calling UnInit(). 
@@ -31,15 +44,6 @@ namespace ZTools.Game.CollisionUtil
         /// </summary>
         [ReadOnly] public bool CanCollideMoreInCollision = false;
 
-        /// <summary>
-        /// Turn it on to receive both collison and trigger event.
-        /// </summary>
-        public bool CanReceiveTrigger = true;
-
-        /// <summary>
-        /// 2D and 3D cannot collide together.
-        /// </summary>
-        public bool Is2DMode = true;
 
         public event Action<CollisionAbility> OnGameCollisionEnter;
         public event Action<CollisionAbility> OnGameCollisionExit;

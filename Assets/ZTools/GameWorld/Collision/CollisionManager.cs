@@ -33,6 +33,8 @@ namespace ZTools.Game.CollisionUtil
 
         private static HashSet<CollisionPairInfo> _collisionCache = new HashSet<CollisionPairInfo>();
 
+        [SerializeField] private CollisionConfig _collisionConfig;
+
         //clear before next frame
         void LateUpdate()
         {
