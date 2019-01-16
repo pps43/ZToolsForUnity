@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ZTools.Game.CollisionUtil
 {
-    public class CollisionUtil
+    public class CollisionMath
     {
         private const int MAX_OVERLAPPED_CACHE = 50;
         private static Collider2D[] _overlappedCache = new Collider2D[MAX_OVERLAPPED_CACHE];
