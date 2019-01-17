@@ -41,11 +41,12 @@ namespace ZTools.Game.CollisionUtil
             _collisionCache.Clear();
         }
 
-        public static bool CanPassTypeTest(CollisionAbility me, CollisionAbility other)
+        public bool CanPassTypeTest(CollisionAbility me, CollisionAbility other)
         {
-            //TODO : use type matrix? or typebitmask?
+            if (me == null || other == null)
+                return false;
 
-            return false;
+            return _collisionConfig[(int)me.Type, (int)other.Type];
         }
 
         /// <summary>
@@ -94,5 +95,40 @@ namespace ZTools.Game.CollisionUtil
             return ret;
 
         }
+
+        //public bool canPassExclusiveTest(CollisionJudgeAbility me, CollisionJudgeAbility other)
+        //{
+        //    if (me == null || other == null)
+        //        return false;
+
+        //    foreach (ColliderInfo info in _collisionSnapshootSet)
+        //    {
+        //        if ((info.c1 == me && info.c2 == other) || (info.c1 == other && info.c2 == me))
+        //            return true;
+        //    }
+
+
+        //    if (me.canReceiveCollision && other.canReceiveCollision)//两者都是enable，可碰撞并记录在字典里
+        //    {
+        //        foreach (ColliderInfo info in _collisionSnapshootSet)
+        //        {
+        //            if ((info.c1 == me && info.c2 == other) || (info.c1 == other && info.c2 == me))
+        //                return true;
+        //        }
+        //        _collisionSnapshootSet.Add(new ColliderInfo(me, other));
+        //        return true;
+        //    }
+        //    else if (me.canReceiveCollision || other.canReceiveCollision)//否则查看是否在字典里有记录，因为两个actor的碰撞回调有先后顺序，所以不能交给actor个体自己判断对方的enable。
+        //    {
+        //        foreach (ColliderInfo info in _collisionSnapshootSet)
+        //        {
+        //            if ((info.c1 == me && info.c2 == other) || (info.c1 == other && info.c2 == me))
+        //                return true;
+        //        }
+        //    }
+
+
+        //    return false;
+        //}
     }
 }

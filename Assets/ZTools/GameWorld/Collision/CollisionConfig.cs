@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using ZTools.DebugUtil;
 
@@ -9,69 +10,124 @@ namespace ZTools.Game.CollisionUtil
     [CreateAssetMenu(fileName = "NewCollisonConfig", menuName = "ZTools/CollisionConfig")]
     public class CollisionConfig : ScriptableObject
     {
-        [SerializeField] public Dictionary<int, bool> matrix2D = new Dictionary<int, bool>();
-        [SerializeField] public string[] names;
+        //Dictionary cannot be serialized in unity, even in your custom editor, it seems to be saved. Use 1-D array instead, cause 2-D array are not supported either.
+        //[SerializeField] public Dictionary<int, bool> matrix2D = new Dictionary<int, bool>();
+        [SerializeField] private bool[] matrixArray;
+        [SerializeField] public string[] allTypeNames;
 
         public int Width { get; private set; }
         public int Height { get; private set; }
-        public long Count { get { return matrix2D.Count; } }
 
-        private void OnEnable()
+        public void init()
         {
-            Reset();
-        }
+            allTypeNames = Enum.GetNames(typeof(ColliderType));
+            Width = allTypeNames.Length;
+            Height = allTypeNames.Length;
 
-        public void Reset()
-        {
-            names = Enum.GetNames(typeof(GameColliderType));
-            Width = names.Length;
-            Height = Width;
+            //TODO resortName into diffrent layer group
 
-            //default value : only collides with self
+            matrixArray = new bool[Width * Height];
+
             for (int i = 0; i < Width; i++)
             {
                 for (int j = 0; j < Height; j++)
                 {
-                    this[i, j] = i == j;
+                    matrixArray[i * Height + j] = false;
                 }
             }
         }
 
-        public bool this[int r, int c]
+        //refresh while keep old value as much as you can
+        public void Refresh()
         {
-            get
+            var newNames = Enum.GetNames(typeof(ColliderType));
+
+            if (nameHasChanged(allTypeNames, newNames))
             {
-                int index = r * Width + c;
-                bool res = false;
-                if (!matrix2D.TryGetValue(index, out res))
+                var oldMatrixDic = new Dictionary<ColliderType, HashSet<ColliderType>>();
+                for (int i = 0; i < Width; i++)
                 {
-                    ZLog.error("No definition found");
+                    for (int j = 0; j < Height; j++)
+                    {
+                        if (matrixArray[i * Height + j])
+                        {
+                            if (!oldMatrixDic.ContainsKey((ColliderType)i))
+                            {
+                                oldMatrixDic.Add((ColliderType)i, new HashSet<ColliderType>());
+                            }
+                            oldMatrixDic[(ColliderType)i].Add((ColliderType)j);
+                        }
+                    }
                 }
-                return res;
-            }
-            set
-            {
-                int index = r * Width + c;
-                matrix2D[index] = value;
+
+                allTypeNames = newNames;
+                Width = allTypeNames.Length;
+                Height = Width;
+
+                matrixArray = new bool[Width * Height];
+
+                for (int i = 0; i < Width; i++)
+                {
+                    for (int j = 0; j < Height; j++)
+                    {
+                        if (oldMatrixDic.ContainsKey((ColliderType)i) && oldMatrixDic[(ColliderType)i].Contains((ColliderType)j))
+                        {
+                            this[i, j] = true;
+                        }
+                        else
+                        {
+                            this[i, j] = false;
+                        }
+                    }
+                }
             }
         }
 
-        public bool this[GameColliderType row, GameColliderType col]
+        private bool nameHasChanged(string[] oldName, string[] newName)
+        {
+            if (oldName == null || newName == null) { return false; }
+
+            return oldName.Length != newName.Length; //TODO more accurate algorithm to detect difference
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < Width; i++)
+            {
+                for (int j = 0; j < Height; j++)
+                {
+                    if (matrixArray[i * Height + j])
+                    {
+                        sb.Append((ColliderType)i).
+                            Append(" <==> ").
+                            Append((ColliderType)j).Append(",  ");
+                    }
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        public bool this[int i, int j]
         {
             get
             {
-                int index = (int)row * Width + (int)col;
-                bool res = false;
-                if(!matrix2D.TryGetValue(index, out res))
+                if (i < Width && j < Height && matrixArray != null)
                 {
-                    ZLog.error("No definition found between",row.ToString(), "and", col.ToString());
+                    return matrixArray[i * Height + j];
                 }
-                return res;
+                else
+                {
+                    return false;
+                }
             }
             set
             {
-                int index = (int)row * Width + (int)col;
-                matrix2D[index] = value;
+                if (i < Width && j < Height && matrixArray != null)
+                {
+                    matrixArray[i * Height + j] = value;
+                }
             }
         }
 

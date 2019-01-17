@@ -5,7 +5,7 @@ using ZTools.DebugUtil;
 
 namespace ZTools.Game.CollisionUtil
 {
-    public enum GameColliderType
+    public enum ColliderType
     {
         hero,
         sword,
@@ -48,8 +48,8 @@ namespace ZTools.Game.CollisionUtil
         public event Action<CollisionAbility> OnGameCollisionEnter;
         public event Action<CollisionAbility> OnGameCollisionExit;
 
-        public GameColliderType Type { get { return _type; } }
-        [SerializeField] private GameColliderType _type = GameColliderType.hero; //modify in editor
+        public ColliderType Type { get { return _type; } }
+        [SerializeField] private ColliderType _type = ColliderType.hero; //modify in editor
 
         public override void Init(BaseObject ownerObject)
         {

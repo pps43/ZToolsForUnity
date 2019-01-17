@@ -9,43 +9,48 @@ namespace ZTools.EditorUtil
     [CustomEditor(typeof(CollisionConfig))]
     public class CollisonConfigEditor : Editor
     {
-        SerializedProperty matrix;
-
-        private void OnEnable()
-        {
-            matrix = serializedObject.FindProperty("matrix2D");
-
-        }
+        bool valueChange = false;
 
         public override void OnInspectorGUI()
         {
-            serializedObject.Update();
             CollisionConfig config = target as CollisionConfig;
 
-            //if (GUILayout.Button("Refresh"))
-            //{
-            //    config.Reset();
-            //    serializedObject.Update();
+            GUILayout.Label("Back To Empty state");
+            if (GUILayout.Button("init/reset"))
+            {
+                config.init();
+            }
 
-            //    //foreach (var item in Resources.FindObjectsOfTypeAll<EditorWindow>())
-            //    //{
-            //    //    Debug.Log(item.GetType().ToString());
-            //    //}
+            GUILayout.Space(20);
+            GUILayout.Label("Sync if you change ColliderType");
+            if (GUILayout.Button("Refresh"))
+            {
+                config.Refresh();
+            }
 
-            //}
+            GUILayout.Space(20);
+            if (valueChange)
+            {
+                if (GUILayout.Button("Value changed, Click or Press Ctrl + S", GUILayout.Height(50)))
+                {
+                    valueChange = false;
+                    AssetDatabase.SaveAssets();
+                }
+            }
 
             show(config);
 
-            serializedObject.ApplyModifiedProperties();
+            EditorUtility.SetDirty(config); //This is very important
+
         }
 
         private void show(CollisionConfig config)
         {
             int labelSize = 50;
             // find the longest label
-            for (int i = 0; i < config.names.Length; i++)
+            for (int i = 0; i < config.allTypeNames.Length; i++)
             {
-                var textDimensions = GUI.skin.label.CalcSize(new GUIContent(config.names[i]));
+                var textDimensions = GUI.skin.label.CalcSize(new GUIContent(config.allTypeNames[i]));
                 if (labelSize < textDimensions.x)
                     labelSize = (int)textDimensions.x;
             }
@@ -59,26 +64,26 @@ namespace ZTools.EditorUtil
                 var topLabelRect = GUILayoutUtility.GetRect(checkboxSize + labelSize, labelSize);
                 var topLeft = new Vector2(topLabelRect.x, topLabelRect.y);
                 var y = 0;
-                for (int i = 0; i < config.names.Length; i++)
+                for (int i = 0; i < config.allTypeNames.Length; i++)
                 {
                     var translate = new Vector3(labelSize + indent + checkboxSize * y + topLeft.x, topLeft.y , 0);
                     //GUI.matrix = Matrix4x4.TRS(translate, Quaternion.Euler(0, 0, 90), Vector3.one);
                     GUI.matrix = Matrix4x4.TRS(new Vector3(180+checkboxSize * y, topLeft.y,0), Quaternion.Euler(0, 0, 90), Vector3.one);
-                    GUI.Label(new Rect(0, 0, labelSize, checkboxSize), config.names[i], "RightLabel");
+                    GUI.Label(new Rect(0, 0, labelSize, checkboxSize), config.allTypeNames[i], "RightLabel");
                     y++;
                 }
 
                 GUI.matrix = Matrix4x4.identity;
                 y = 0;
-                for (int i = 0; i < config.names.Length; i++)
+                for (int i = 0; i < config.allTypeNames.Length; i++)
                 {
                     int x = 0;
-                    var r = GUILayoutUtility.GetRect(indent + checkboxSize * config.names.Length + labelSize, checkboxSize);
-                    GUI.Label(new Rect(/*r.x + indent*/0, r.y, labelSize, checkboxSize), config.names[i], "RightLabel");
+                    var r = GUILayoutUtility.GetRect(indent + checkboxSize * config.allTypeNames.Length + labelSize, checkboxSize);
+                    GUI.Label(new Rect(/*r.x + indent*/0, r.y, labelSize, checkboxSize), config.allTypeNames[i], "RightLabel");
 
-                    for (int j = 0; j < config.names.Length; j++)
+                    for (int j = 0; j < config.allTypeNames.Length; j++)
                     {
-                        var tooltip = new GUIContent("", config.names[i] + " with " + config.names[j]);
+                        var tooltip = new GUIContent("", config.allTypeNames[i] + " with " + config.allTypeNames[j]);
                         bool val = getValue(config,i, j);
                         bool toggle = GUI.Toggle(new Rect(labelSize + indent + r.x + x * checkboxSize, r.y, checkboxSize, checkboxSize), val, tooltip);
                         if (toggle != val)
