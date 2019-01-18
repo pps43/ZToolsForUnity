@@ -52,7 +52,7 @@ namespace ZTools.Game.CollisionUtil
         /// <summary>
         /// c1 and c2 must be in same pair or not recorded at all to return a valid collison
         /// </summary>
-        public static bool CanPassExclusiveTest(CollisionAbility me, CollisionAbility other)
+        public bool CanPassExclusiveTest(CollisionAbility me, CollisionAbility other)
         {
             if (me == null || other == null /*|| c1.abilityOwner == null || c2.abilityOwner == null*/)
             {

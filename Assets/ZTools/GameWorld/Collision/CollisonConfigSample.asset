@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21e0b0e77305dd845b9095687b1a7474, type: 3}
   m_Name: CollisonConfigSample
   m_EditorClassIdentifier: 
-  names:
+  matrixArray: 000100000000000000
+  allTypeNames:
   - hero
   - sword
   - enemy
-  - xx
-  - youafoausfoodaf

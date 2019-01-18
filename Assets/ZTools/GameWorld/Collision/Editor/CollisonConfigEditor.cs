@@ -26,6 +26,7 @@ namespace ZTools.EditorUtil
             if (GUILayout.Button("Refresh"))
             {
                 config.Refresh();
+                valueChange = true;
             }
 
             GUILayout.Space(20);
@@ -55,7 +56,6 @@ namespace ZTools.EditorUtil
                     labelSize = (int)textDimensions.x;
             }
             labelSize += 30;
-            Debug.Log(labelSize);
 
             if(true)
             {
@@ -89,6 +89,7 @@ namespace ZTools.EditorUtil
                         if (toggle != val)
                         {
                             setValue(config, i, j, toggle);
+                            valueChange = true;
                         }
                         x++;
                     }

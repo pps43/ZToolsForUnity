@@ -10,8 +10,6 @@ namespace ZTools.Game.CollisionUtil
         hero,
         sword,
         enemy,
-        xx,
-        youafoausfoodaf,
     }
 
     /// <summary>
@@ -171,11 +169,11 @@ namespace ZTools.Game.CollisionUtil
             if (!HasInit || other == null) { return false; }
 
             //bool isTypeCompatible = other.colliderTypeBit & this.colliderMask) > 0 ? true : false;
-            bool isTypeCompatible = CollisionManager.CanPassTypeTest(this, other);
+            bool isTypeCompatible = GamePlay.instance.collisionManager.CanPassTypeTest(this, other); // TODO do we need GamePlay ref?
 
             if (isTypeCompatible)
             {
-                bool isPassExclusiveTest = CollisionManager.CanPassExclusiveTest(this, other);
+                bool isPassExclusiveTest = GamePlay.instance.collisionManager.CanPassExclusiveTest(this, other);
                 if(isPassExclusiveTest)
                 {
                     return true;
