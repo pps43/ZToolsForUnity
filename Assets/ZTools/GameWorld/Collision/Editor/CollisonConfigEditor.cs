@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using ZTools.Game.CollisionUtil;
+using ZTools.DebugUtil;
 
 namespace ZTools.EditorUtil
 {
@@ -19,6 +18,7 @@ namespace ZTools.EditorUtil
             if (GUILayout.Button("init/reset"))
             {
                 config.init();
+                ZLog.log(config.ToString());
             }
 
             GUILayout.Space(20);
@@ -26,6 +26,7 @@ namespace ZTools.EditorUtil
             if (GUILayout.Button("Refresh"))
             {
                 config.Refresh();
+                ZLog.log(config.ToString());
                 valueChange = true;
             }
 

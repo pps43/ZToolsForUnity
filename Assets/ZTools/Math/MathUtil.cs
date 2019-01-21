@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 namespace ZTools.MathUtil
 {
     public class MathUtil : MonoBehaviour

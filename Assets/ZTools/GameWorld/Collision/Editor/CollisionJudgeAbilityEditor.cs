@@ -1,9 +1,4 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System.Collections;
-using UnityEditor.SceneManagement;
-
-namespace ZTools.EditorUtil.CustomInspector
+﻿namespace ZTools.EditorUtil.CustomInspector
 {
     // change array value according to Enum
     //[CustomEditor(typeof(CollisionJudgeAbility))]
