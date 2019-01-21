@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
-using ZTools.DebugUtil;
 
 namespace ZTools.Game.CollisionUtil
 {
@@ -15,24 +13,26 @@ namespace ZTools.Game.CollisionUtil
         [SerializeField] private bool[] matrixArray;
         [SerializeField] public string[] allTypeNames;
 
-        public int Width { get; private set; }
-        public int Height { get; private set; }
+        //public int width { get; private set; }  // property cannot be serialized in unity.
+        //public int height { get; private set; }
+        public int width;
+        public int height;
 
         public void init()
         {
             allTypeNames = Enum.GetNames(typeof(ColliderType));
-            Width = allTypeNames.Length;
-            Height = allTypeNames.Length;
+            width = allTypeNames.Length;
+            height = allTypeNames.Length;
 
             //TODO resortName into diffrent layer group
 
-            matrixArray = new bool[Width * Height];
+            matrixArray = new bool[width * height];
 
-            for (int i = 0; i < Width; i++)
+            for (int i = 0; i < width; i++)
             {
-                for (int j = 0; j < Height; j++)
+                for (int j = 0; j < height; j++)
                 {
-                    matrixArray[i * Height + j] = false;
+                    matrixArray[i * height + j] = false;
                 }
             }
         }
@@ -45,11 +45,11 @@ namespace ZTools.Game.CollisionUtil
             if (nameHasChanged(allTypeNames, newNames))
             {
                 var oldMatrixDic = new Dictionary<ColliderType, HashSet<ColliderType>>();
-                for (int i = 0; i < Width; i++)
+                for (int i = 0; i < width; i++)
                 {
-                    for (int j = 0; j < Height; j++)
+                    for (int j = 0; j < height; j++)
                     {
-                        if (matrixArray[i * Height + j])
+                        if (matrixArray[i * height + j])
                         {
                             if (!oldMatrixDic.ContainsKey((ColliderType)i))
                             {
@@ -61,14 +61,14 @@ namespace ZTools.Game.CollisionUtil
                 }
 
                 allTypeNames = newNames;
-                Width = allTypeNames.Length;
-                Height = Width;
+                width = allTypeNames.Length;
+                height = width;
 
-                matrixArray = new bool[Width * Height];
+                matrixArray = new bool[width * height];
 
-                for (int i = 0; i < Width; i++)
+                for (int i = 0; i < width; i++)
                 {
-                    for (int j = 0; j < Height; j++)
+                    for (int j = 0; j < height; j++)
                     {
                         if (oldMatrixDic.ContainsKey((ColliderType)i) && oldMatrixDic[(ColliderType)i].Contains((ColliderType)j))
                         {
@@ -93,11 +93,12 @@ namespace ZTools.Game.CollisionUtil
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < Width; i++)
+            sb.Append("(width, height) = (").Append(width).Append(", ").Append(height);
+            for (int i = 0; i < width; i++)
             {
-                for (int j = 0; j < Height; j++)
+                for (int j = 0; j < height; j++)
                 {
-                    if (matrixArray[i * Height + j])
+                    if (matrixArray[i * height + j])
                     {
                         sb.Append((ColliderType)i).
                             Append(" <==> ").
@@ -113,9 +114,9 @@ namespace ZTools.Game.CollisionUtil
         {
             get
             {
-                if (i < Width && j < Height && matrixArray != null)
+                if (i < width && j < height && matrixArray != null)
                 {
-                    return matrixArray[i * Height + j];
+                    return matrixArray[i * height + j];
                 }
                 else
                 {
@@ -124,9 +125,9 @@ namespace ZTools.Game.CollisionUtil
             }
             set
             {
-                if (i < Width && j < Height && matrixArray != null)
+                if (i < width && j < height && matrixArray != null)
                 {
-                    matrixArray[i * Height + j] = value;
+                    matrixArray[i * height + j] = value;
                 }
             }
         }
