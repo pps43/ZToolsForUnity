@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace ZTools.Game
 {
+    //TODO use BaseObjectFactory instead
     public interface IBaseObjectFactory
     {
         BaseObject Generate(string prefabPath);
@@ -81,7 +82,7 @@ namespace ZTools.Game
                     obj.UnInit();
                 }
 
-                if(_objectFactory != null)
+                if (_objectFactory != null)
                 {
                     _objectFactory.Recycle(obj);
                 }
@@ -91,6 +92,6 @@ namespace ZTools.Game
                 }
             }
         }
-        
+
     }
 }
