@@ -28,19 +28,20 @@ namespace ZTools.Game.CollisionUtil
         /// <summary>
         /// Turn it on to receive both collison and trigger event.
         /// </summary>
-        public bool CanReceiveTrigger = true;
+        public bool CanReceiveBothCollisionAndTrigger = true;
 
         /// <summary>
         /// Sometimes when handling a pair of collision,
         /// we want to block out all other collision without calling UnInit(). 
+        /// 
         /// Assign this value to false in this scenario.
         /// 
-        /// e.g. when an enemy dies, it may no longer collide with other weapon according to your design,
-        /// but if you use FSM, it will turn to dead state in next frame, so following weapon still collides with it.
+        /// e.g. when an enemy dies, it may no longer collide with other weapon according to your game design,
+        /// but if you use FSM, it will turn to dead state in next frame, so weapon still collides in this frame.
         /// If you call UnInit() immediately, it may cause none object reference error in another BaseObject's script,
         /// since ontrigger function's order is ramdom in one collision pair.
         /// </summary>
-        [ReadOnly] public bool CanCollideMoreInCollision = false;
+        [ReadOnly] public bool CanReceiveMoreCollision = false;
 
 
         public event Action<CollisionAbility> OnGameCollisionEnter;
@@ -52,13 +53,13 @@ namespace ZTools.Game.CollisionUtil
         public override void Init(BaseObject ownerObject)
         {
             base.Init(ownerObject);
-            CanCollideMoreInCollision = true;
+            CanReceiveMoreCollision = true;
         }
 
         public override void UnInit()
         {
             base.UnInit();
-            CanCollideMoreInCollision = false;
+            CanReceiveMoreCollision = false;
         }
 
         #region Unity Collision Enter event
@@ -84,7 +85,7 @@ namespace ZTools.Game.CollisionUtil
             if (!HasInit || other == null) { return; }
             if (Is2DMode) { return; }
 
-            if (CanReceiveTrigger)
+            if (CanReceiveBothCollisionAndTrigger)
             {
                 CollisionAbility ca = other.gameObject.GetComponent<CollisionAbility>();
                 ProcessCollisionEnter(ca);
@@ -96,7 +97,7 @@ namespace ZTools.Game.CollisionUtil
             if (!HasInit || other == null) { return; }
             if (!Is2DMode) { return; }
 
-            if (CanReceiveTrigger)
+            if (CanReceiveBothCollisionAndTrigger)
             {
                 CollisionAbility ca = other.gameObject.GetComponent<CollisionAbility>();
                 ProcessCollisionEnter(ca);
@@ -127,7 +128,7 @@ namespace ZTools.Game.CollisionUtil
             if (!HasInit || other == null) { return; }
             if (Is2DMode) { return; }
 
-            if (CanReceiveTrigger)
+            if (CanReceiveBothCollisionAndTrigger)
             {
                 CollisionAbility ca = other.gameObject.GetComponent<CollisionAbility>();
                 ProcessCollisionExit(ca);
@@ -138,7 +139,7 @@ namespace ZTools.Game.CollisionUtil
             if (!HasInit || other == null) { return; }
             if (!Is2DMode) { return; }
 
-            if (CanReceiveTrigger)
+            if (CanReceiveBothCollisionAndTrigger)
             {
                 CollisionAbility ca = other.gameObject.GetComponent<CollisionAbility>();
                 ProcessCollisionExit(ca);

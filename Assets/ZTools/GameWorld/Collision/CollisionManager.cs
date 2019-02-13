@@ -10,7 +10,7 @@ namespace ZTools.Game.CollisionUtil
     /// Sometimes we want to collision only happen in two object in one frame,
     /// Then we need a center to record some info.
     /// 
-    /// Notice, the order of onTriggerEnter function call is random !
+    /// Notice, the call order of onTriggerEnter function is random !
     /// 
     /// </summary>
     public class CollisionManager : MonoBehaviour
@@ -29,16 +29,28 @@ namespace ZTools.Game.CollisionUtil
             {
                 return _c1 == c || _c2 == c;
             }
+
+            public bool isEqual(CollisionAbility c1, CollisionAbility c2)
+            {
+                if((_c1 == c1 && _c2==c2) || (_c1 == c2 && _c2 == c1))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
-        private static HashSet<CollisionPairInfo> _collisionCache = new HashSet<CollisionPairInfo>();
+        private static HashSet<CollisionPairInfo> _beInCollisionCache = new HashSet<CollisionPairInfo>();
 
         [SerializeField] private CollisionConfig _collisionConfig;
 
         //clear before next frame
         void LateUpdate()
         {
-            _collisionCache.Clear();
+            _beInCollisionCache.Clear();
         }
 
         public bool CanPassTypeTest(CollisionAbility me, CollisionAbility other)
@@ -54,81 +66,30 @@ namespace ZTools.Game.CollisionUtil
         /// </summary>
         public bool CanPassExclusiveTest(CollisionAbility me, CollisionAbility other)
         {
+            //illegal
             if (me == null || other == null /*|| c1.abilityOwner == null || c2.abilityOwner == null*/)
             {
                 return false;
             }
 
-            bool ret = true;
-            bool needAdd = true;
-            foreach (var pairInfo in _collisionCache)
+            //same pair
+            foreach (var pairInfo in _beInCollisionCache)
             {
-                if(pairInfo.has(me))
+                if(pairInfo.isEqual(me, other))
                 {
-                    if (!pairInfo.has(other))
-                    {
-                        ret = false;
-                    }
-                    needAdd = false;
-                }
-                else
-                {
-                    if(pairInfo.has(other))
-                    {
-                        ret = false;
-                        needAdd = false;
-                    }
+                    return true;
                 }
             }
 
-            if(needAdd)
+            //maybe new pair. examine CanCollideMoreInCollision
+            if(me.CanReceiveMoreCollision && other.CanReceiveMoreCollision)
             {
                 //ZLog.verbose("add", c1.abilityOwner.name, ",", c2.abilityOwner.name);
-                _collisionCache.Add(new CollisionPairInfo(me, other));
+                _beInCollisionCache.Add(new CollisionPairInfo(me, other));
+                return true;
             }
 
-            //if(ret)
-            //{
-            //    ZLog.verbose("collision accept", c1.abilityOwner.name, ",", c2.abilityOwner.name);
-            //}
-
-            return ret;
-
+            return false;
         }
-
-        //public bool canPassExclusiveTest(CollisionJudgeAbility me, CollisionJudgeAbility other)
-        //{
-        //    if (me == null || other == null)
-        //        return false;
-
-        //    foreach (ColliderInfo info in _collisionSnapshootSet)
-        //    {
-        //        if ((info.c1 == me && info.c2 == other) || (info.c1 == other && info.c2 == me))
-        //            return true;
-        //    }
-
-
-        //    if (me.canReceiveCollision && other.canReceiveCollision)//两者都是enable，可碰撞并记录在字典里
-        //    {
-        //        foreach (ColliderInfo info in _collisionSnapshootSet)
-        //        {
-        //            if ((info.c1 == me && info.c2 == other) || (info.c1 == other && info.c2 == me))
-        //                return true;
-        //        }
-        //        _collisionSnapshootSet.Add(new ColliderInfo(me, other));
-        //        return true;
-        //    }
-        //    else if (me.canReceiveCollision || other.canReceiveCollision)//否则查看是否在字典里有记录，因为两个actor的碰撞回调有先后顺序，所以不能交给actor个体自己判断对方的enable。
-        //    {
-        //        foreach (ColliderInfo info in _collisionSnapshootSet)
-        //        {
-        //            if ((info.c1 == me && info.c2 == other) || (info.c1 == other && info.c2 == me))
-        //                return true;
-        //        }
-        //    }
-
-
-        //    return false;
-        //}
     }
 }
