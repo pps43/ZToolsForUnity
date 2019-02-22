@@ -10,7 +10,7 @@ namespace ZTools.Game
     /// e.g. Enemies, Items, TerrainBlocks, NPCs, etc
     /// 
     /// Do not use UnityEvents like Awake(), Start(), OnDestroy() in subclass,
-    /// unless no BaseObjectManager is controlling it (if ActorRemoveEvent == null),
+    /// unless no BaseObjectManager is controlling it (if DisposeEvent == null),
     /// which means BaseObject should take care of itself.
     /// </summary>
     public abstract class BaseObject : MonoBehaviour
@@ -63,11 +63,16 @@ namespace ZTools.Game
 
             if (DisposeEvent != null)
             {
+                if(DisposeEvent.GetInvocationList().Length > 1)
+                {
+                    ZLog.error(gameObject.name, "disposeEvent should only have one listener(Manager)");
+                }
+
                 DisposeEvent(this);
             }
             else
             {
-                ZLog.warn(gameObject.name, "no actorManager attached, destroy itself");
+                ZLog.warn(gameObject.name, "no manager attached, destroy itself");
                 UnInit();
                 Destroy(gameObject);
             }
