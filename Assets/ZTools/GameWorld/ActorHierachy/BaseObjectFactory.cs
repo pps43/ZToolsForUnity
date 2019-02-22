@@ -11,7 +11,7 @@ namespace ZTools.Game
     // child class example：
     // public class EnemyFactory : BaseObjectFactory<BaseEnemy, EnemyType>
     // {
-    //     protected override void listToDic()
+    //     protected override void ListToDic()
     //     {
     //         if (_prefabList != null)
     //         {
@@ -34,7 +34,7 @@ namespace ZTools.Game
         {
             _pool = new GameObjectPool<T, ENUM>(transform);
             _prefabDic = new Dictionary<ENUM, T>();
-            listToDic();
+            ListToDic();
         }
 
         private void OnDestroy()
@@ -44,7 +44,7 @@ namespace ZTools.Game
         }
 
 
-        public T getObject(ENUM type, Transform parent, Vector3 pos, bool isLocalPos)
+        public T GetObject(ENUM type, Transform parent, Vector3 pos, bool isLocalPos)
         {
             T newObj = _pool.getObject(type);
 
@@ -74,13 +74,13 @@ namespace ZTools.Game
         }
 
 
-        public bool returnObject(ENUM type, T obj)
+        public bool ReturnObject(ENUM type, T obj)
         {
             return _pool.returnObject(type, obj);
         }
 
         //这里通过子类实现来实现，避开在基类中泛型难以转化为具体类型的限制
-        protected abstract void listToDic();
+        protected abstract void ListToDic();
 
     }
 }
