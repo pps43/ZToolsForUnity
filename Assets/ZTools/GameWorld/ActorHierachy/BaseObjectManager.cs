@@ -76,6 +76,7 @@ namespace ZTools.Game
             if (Has(obj))
             {
                 _allObject.Remove(obj);
+                obj.DisposeEvent -= Remove;
 
                 if (obj.HasInit) // if actor dispose itself, need not call UnInit()
                 {
