@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using ZTools.DebugUtil;
@@ -7,9 +8,12 @@ namespace ZTools.Game
 {
     /// <summary>
     /// abstract Factory
+    /// 
+    /// Use 'int' as subType ID.
+    /// This is compatible with GameObjectPool.
     /// </summary>
     // child class example：
-    // public class EnemyFactory : BaseObjectFactory<BaseEnemy, EnemyType>
+    // public class EnemyFactory : BaseObjectFactory<BaseEnemy>
     // {
     //     protected override void ListToDic()
     //     {
@@ -22,18 +26,18 @@ namespace ZTools.Game
     //         }
     //     }
     // }
-    public abstract class BaseObjectFactory<T, ENUM> : MonoBehaviour where T : BaseObject
+    public abstract class BaseObjectFactory<T> : MonoBehaviour where T : BaseObject
     {
-        private GameObjectPool<T, ENUM> _pool;
+        private GameObjectPool<T> _pool;
 
         [Header("Prefab's type is described in itself")]
         [SerializeField] protected T[] _prefabList;
-        protected Dictionary<ENUM, T> _prefabDic;
+        protected Dictionary<int, T> _prefabDic;
 
         private void Awake()
         {
-            _pool = new GameObjectPool<T, ENUM>(transform);
-            _prefabDic = new Dictionary<ENUM, T>();
+            _pool = new GameObjectPool<T>(transform);
+            _prefabDic = new Dictionary<int, T>();
             ListToDic();
         }
 
@@ -44,13 +48,13 @@ namespace ZTools.Game
         }
 
 
-        public T GetObject(ENUM type, Transform parent, Vector3 pos, bool isLocalPos)
+        public T GetObject(int typeID, Transform parent, Vector3 pos, bool isLocalPos)
         {
-            T newObj = _pool.getObject(type);
+            T newObj = _pool.getObject(typeID);
 
-            if (newObj == null && _prefabDic.ContainsKey(type))
+            if (newObj == null && _prefabDic.ContainsKey(typeID))
             {
-                newObj = GameObject.Instantiate<T>(_prefabDic[type]);
+                newObj = GameObject.Instantiate<T>(_prefabDic[typeID]);
             }
 
             if (newObj != null)
@@ -67,16 +71,16 @@ namespace ZTools.Game
             }
             else
             {
-                ZLog.error(gameObject.name, "generate type failed:", type.ToString());
+                ZLog.error(gameObject.name, "generate type failed:", typeID.ToString());
             }
 
             return newObj;
         }
 
 
-        public bool ReturnObject(ENUM type, T obj)
+        public bool ReturnObject(T obj)
         {
-            return _pool.returnObject(type, obj);
+            return _pool.returnObject(obj.TypeID, obj);
         }
 
         //这里通过子类实现来实现，避开在基类中泛型难以转化为具体类型的限制

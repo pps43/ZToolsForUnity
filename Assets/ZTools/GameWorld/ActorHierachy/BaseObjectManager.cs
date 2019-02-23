@@ -1,58 +1,51 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ZTools.Game
 {
-    //TODO use BaseObjectFactory instead
-    public interface IBaseObjectFactory
-    {
-        BaseObject Generate(string prefabPath);
-        bool Recycle(BaseObject objectToRecycle); //Better to use Object Pooling
-    }
-
     /// <summary>
-    /// Manage a group of BaseObject: Create/Destroy, Init/UnInit,
+    /// Manage a group of [T]: Create/Destroy, Init/UnInit,
     /// Access by GamePlay singleton. e.g. GamePlay.Instance.xxxManager
     /// 
-    /// <ObjectType> means differenct prefabs that can be create.
+    /// [ObjectTypeEnum] means differenct prefabs that can be create.
     /// e.g. EnemyManager can Generate different types of enemies identified by EnemyType Enum.
     /// </summary>
-    public class BaseObjectManager<ObjectType>
+    public class BaseObjectManager<T, ENUM> where T : BaseObject where ENUM : struct, IConvertible
     {
-        protected List<BaseObject> _allObject = new List<BaseObject>(); //or use Dictionary
-        protected IBaseObjectFactory _objectFactory = null;
+        protected Dictionary<ulong, T> _allObject = null;
+        protected BaseObjectFactory<T> _objectFactory = null;
+        public int ActorNum { get { return _allObject?.Count ?? 0; } }
+
 
         /// <summary>
         /// if not factory assigned, this manager is unable to generate new actor.
         /// </summary>
         /// <param name="factory"></param>
-        public virtual void Init(IBaseObjectFactory factory = null)
+        public virtual void Init(BaseObjectFactory<T> factory = null)
         {
             _objectFactory = factory;
+            _allObject = new Dictionary<ulong, T>();
         }
 
         public virtual void UnInit()
         {
             _objectFactory = null;
+            RemoveALl();
         }
 
-
-        public int ActorNum { get { return _allObject?.Count ?? 0; } }
-
-        public bool Has(BaseObject obj)
+        public bool Has(ulong guid)
         {
-            return _allObject?.Contains(obj) ?? false;
+            return _allObject?.ContainsKey(guid) ?? false;
         }
 
 
-        public BaseObject Generate(ObjectType objType)
+        public virtual T Generate(ENUM objType, Transform parent = null, Vector3 pos = default, bool isLocalPos = true)
         {
             if (_objectFactory != null)
             {
-                string prefabPath = "";
-                //prefabPath = TypeToPath(objType);
-                BaseObject newObj = _objectFactory.Generate(prefabPath);
-                if (newObj)
+                T newObj = _objectFactory.GetObject(objType, parent, pos, isLocalPos);
+                if (newObj != null)
                 {
                     Add(newObj);
                     return newObj;
@@ -61,22 +54,23 @@ namespace ZTools.Game
             return null;
         }
 
-        public void Add(BaseObject obj)
+        public void Add(T obj)
         {
-            if (!Has(obj))
+            if (!Has(obj.GUID))
             {
-                _allObject.Add(obj);
+                _allObject.Add(obj.GUID, obj);
                 obj.DisposeEvent += Remove;  //will trigger when actor Dispose()
                 obj.Init();
             }
         }
 
-        public void Remove(BaseObject obj)
+        public void Remove(ulong guid)
         {
-            if (Has(obj))
+            if (Has(guid))
             {
-                _allObject.Remove(obj);
+                T obj = _allObject[guid];
                 obj.DisposeEvent -= Remove;
+                _allObject.Remove(guid);
 
                 if (obj.HasInit) // if actor dispose itself, need not call UnInit()
                 {
@@ -85,13 +79,18 @@ namespace ZTools.Game
 
                 if (_objectFactory != null)
                 {
-                    _objectFactory.Recycle(obj);
+                    _objectFactory.ReturnObject(obj);
                 }
                 else
                 {
                     GameObject.Destroy(obj.gameObject);
                 }
             }
+        }
+
+        private void RemoveALl()
+        {
+            //TODO
         }
 
     }

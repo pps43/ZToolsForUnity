@@ -6,22 +6,23 @@ using UnityEngine;
 namespace ZTools.Game
 {
     /// <summary>
-    /// 游戏对象池泛型类（用于 Monobehavior），
+    /// GameObjectPool for Monobehavior.
     /// 
-    /// 之所以用Dictionary是因为这样可以同类但不同子类的对象可以用一个对象池管理，比如不同种类的敌人
+    /// Use 'int' as subType ID.
+    /// This is useful when put different types of Enemy in same pool
     /// </summary>
-    public class GameObjectPool<T, ENUM> where T : MonoBehaviour
+    public class GameObjectPool<T> where T : MonoBehaviour
     {
         public GameObjectPool(Transform root)
         {
             poolRoot = root;
-            _pool = new Dictionary<ENUM, List<T>>();
+            _pool = new Dictionary<int, List<T>>();
         }
 
         public Transform poolRoot { get; private set; }
-        private Dictionary<ENUM, List<T>> _pool;
+        private Dictionary<int, List<T>> _pool;
 
-        public T getObject(ENUM type, bool needSetActive = true)
+        public T getObject(int type, bool needSetActive = true)
         {
             T retObj = null;
 
@@ -39,7 +40,7 @@ namespace ZTools.Game
             return retObj;
         }
 
-        public bool returnObject(ENUM type, T obj)
+        public bool returnObject(int type, T obj)
         {
             if (obj == null) { return false; }
 

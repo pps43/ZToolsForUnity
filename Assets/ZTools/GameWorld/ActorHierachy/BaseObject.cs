@@ -12,13 +12,18 @@ namespace ZTools.Game
     /// Do not use UnityEvents like Awake(), Start(), OnDestroy() in subclass,
     /// unless no BaseObjectManager is controlling it (if DisposeEvent == null),
     /// which means BaseObject should take care of itself.
+    /// 
+    /// TypeID is used in object pool to identify object's sub-type.
+    /// For example, Enemy may have an enum EnemyType field called 'etype', we can override TypeNum as:
+    /// public override int TypeID => (int)etype
     /// </summary>
-    public abstract class BaseObject : MonoBehaviour
+    public abstract class BaseObject: MonoBehaviour
     {
-        //public ulong Guid { get; private set; }
+        public ulong GUID { get; private set; }
+        public abstract int TypeID { get; }
         public bool HasInit { get; private set; }
 
-        public event Action<BaseObject> DisposeEvent;
+        public event Action<ulong> DisposeEvent;
         
 
         #region Init/UnInit
@@ -68,7 +73,7 @@ namespace ZTools.Game
                     ZLog.error(gameObject.name, "disposeEvent should only have one listener(Manager)");
                 }
 
-                DisposeEvent(this);
+                DisposeEvent(GUID);
             }
             else
             {

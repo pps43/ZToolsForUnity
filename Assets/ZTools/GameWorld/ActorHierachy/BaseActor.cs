@@ -11,6 +11,8 @@ namespace ZTools.Game
     /// </summary>
     public class BaseActor : BaseObject, IUpdatable
     {
+        public override int TypeID => throw new NotImplementedException();
+
         public event Action updateEvent;
 
         //[SerializeField] private xxAbility;
