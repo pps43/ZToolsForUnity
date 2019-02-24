@@ -1,28 +1,30 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ZTools.Demo;
 using ZTools.Game;
-
-public class Main : MonoBehaviour
+namespace ZTools.Demo
 {
-    private EnemyManager enemyManager;
-    public EnemyFactory factory;
 
-    IEnumerator Start()
+    public class Main : MonoBehaviour
     {
-        enemyManager = new EnemyManager();
-        enemyManager.Init(factory);
+        private EnemyManager enemyManager;
+        public EnemyFactory factory;
 
-        yield return null;
+        IEnumerator Start()
+        {
+            enemyManager = new EnemyManager();
+            enemyManager.Init(factory);
 
-        enemyManager.Generate(EnemyType.flyer);
+            yield return null;
 
-        enemyManager.UnInit();//after unInit, nothing will be generate.
+            enemyManager.Generate(EnemyType.flyer);
 
-        yield return new WaitForSeconds(2f);
+            enemyManager.UnInit();//after unInit, nothing will be generate.
 
-        enemyManager.Generate(EnemyType.walker);
+            yield return new WaitForSeconds(2f);
+
+            enemyManager.Generate(EnemyType.walker);
+        }
+
     }
-    
 }
