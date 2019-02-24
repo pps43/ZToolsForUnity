@@ -17,3 +17,5 @@ MonoBehaviour:
   - hero
   - sword
   - enemy
+  width: 0
+  height: 0
