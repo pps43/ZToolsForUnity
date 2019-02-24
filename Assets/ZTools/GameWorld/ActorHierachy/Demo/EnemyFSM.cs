@@ -1,6 +1,7 @@
 ﻿using ZTools.Event;
+using ZTools.FSM;
 
-namespace ZTools.FSM.Demo
+namespace ZTools.Demo
 {
     //this shortcut is only valid in this file
     using BaseState = BaseState<Enemy, SelfEvent, CommonEvent>;
@@ -40,37 +41,37 @@ namespace ZTools.FSM.Demo
 
     public class GlobalState : BaseState
     {
-        public override object onMessage(Enemy owner, SelfEvent innerMsg)
+        public override object OnMessage(Enemy owner, SelfEvent innerMsg)
         {
             if (innerMsg.eventID == SelfEvent.ID.onHurt)
             {
-                if(owner.health <= 0)
+                if(owner.Health <= 0)
                 {
-                    owner.fsm.changeState(new DeadState());
+                    owner.FSM.changeState(new DeadState());
                 }
             }
-            return base.onMessage(owner, innerMsg);
+            return base.OnMessage(owner, innerMsg);
         }
     }
 
 
     public class IdleState : BaseState
     {
-        public override void enter(Enemy owner, object param)
+        public override void Enter(Enemy owner, object param)
         {
-            base.enter(owner, param);
-            owner.doIdle();
+            base.Enter(owner, param);
+            owner.DoIdle();
         }
 
         //receive commonEvent
-        public override object onMessage(Enemy owner, CommonEvent outerMsg)
+        public override object OnMessage(Enemy owner, CommonEvent outerMsg)
         {
             if(outerMsg.eventID == EventID.onTurn)
             {
-                owner.fsm.changeState(new AttackState("someparameter"));
+                owner.FSM.changeState(new AttackState("someparameter"));
             }
 
-            return base.onMessage(owner, outerMsg);
+            return base.OnMessage(owner, outerMsg);
         }
     }
 
@@ -85,31 +86,31 @@ namespace ZTools.FSM.Demo
             _attackParam = attackParam;
         }
 
-        public override void enter(Enemy owner, object param)
+        public override void Enter(Enemy owner, object param)
         {
-            base.enter(owner, param);
-            owner.doAttack();
+            base.Enter(owner, param);
+            owner.DoAttack();
         }
 
         //receive selfEvent
-        public override object onMessage(Enemy owner, SelfEvent innerMsg)
+        public override object OnMessage(Enemy owner, SelfEvent innerMsg)
         {
             if(innerMsg.eventID == SelfEvent.ID.onAttackEnd)
             {
-                owner.fsm.changeState(new IdleState());
+                owner.FSM.changeState(new IdleState());
             }
 
-            return base.onMessage(owner, innerMsg);
+            return base.OnMessage(owner, innerMsg);
         }
     }
 
 
     public class DeadState : BaseState
     {
-        public override void enter(Enemy owner, object param)
+        public override void Enter(Enemy owner, object param)
         {
-            base.enter(owner, param);
-            owner.doDie();
+            base.Enter(owner, param);
+            owner.DoDie();
         }
     }
 

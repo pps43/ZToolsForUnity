@@ -26,7 +26,7 @@ namespace ZTools.Game
     //         }
     //     }
     // }
-    public abstract class BaseObjectFactory<T> : MonoBehaviour where T : BaseObject
+    public abstract class BaseObjectFactory<TEnum, T> : MonoBehaviour where T : BaseObject where TEnum : struct, IConvertible
     {
         private GameObjectPool<T> _pool;
 
@@ -48,8 +48,10 @@ namespace ZTools.Game
         }
 
 
-        public T GetObject(int typeID, Transform parent, Vector3 pos, bool isLocalPos)
+        public T GetObject(TEnum objType, Transform parent, Vector3 pos, bool isLocalPos)
         {
+            int typeID = Convert.ToInt32(objType);// TODO : optimize GC here
+
             T newObj = _pool.getObject(typeID);
 
             if (newObj == null && _prefabDic.ContainsKey(typeID))

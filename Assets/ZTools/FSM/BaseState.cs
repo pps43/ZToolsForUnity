@@ -5,14 +5,14 @@
     /// </summary>
     public abstract class BaseState<T, P, Q> /*where P : BaseEvent where Q: BaseEvent*/
     {
-        public virtual object onMessage(T owner, P innerMsg) { return null; }
-        public virtual object onMessage(T owner, Q outerMsg) { return null; }
+        public virtual object OnMessage(T owner, P innerMsg) { return null; }
+        public virtual object OnMessage(T owner, Q outerMsg) { return null; }
 
-        public virtual void enter(T owner, object param) { }
+        public virtual void Enter(T owner, object param) { }
 
-        public virtual void update(T owner) { }
+        public virtual void Update(T owner) { }
 
-        public virtual void exit(T owner) { }
+        public virtual void Exit(T owner) { }
 
         public override string ToString()
         {

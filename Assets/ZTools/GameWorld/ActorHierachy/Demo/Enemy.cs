@@ -1,18 +1,87 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class Enemy : MonoBehaviour
+using ZTools.Event;
+using ZTools.FSM;
+using ZTools.Game;
+using ZTools.EditorUtil.CustomAttribute;
+namespace ZTools.Demo
 {
-    // Start is called before the first frame update
-    void Start()
+    public enum EnemyType
     {
-        
+        walker,
+        flyer,
     }
 
-    // Update is called once per frame
-    void Update()
+
+    public class Enemy : BaseActor
     {
-        
+        [SerializeField] private EnemyType _type;
+        public override int TypeID => (int)_type;
+
+        public float Health { get; private set; }
+        public FSM<Enemy, SelfEvent, CommonEvent> FSM { get; private set; }
+        private EventHelper _eventHelper = new EventHelper();
+
+        public override void Init()
+        {
+            base.Init();
+            Health = 100f;
+            _eventHelper.addListener(EventID.onTurn, OnGameTurn);
+            FSM = FSMFactory.createFSM(this, new IdleState(), new GlobalState());
+            FSM.start();
+        }
+
+        public override void UnInit()
+        {
+            base.UnInit();
+            FSM.stop();
+        }
+
+
+        #region Sense Layer, receive game event
+
+        //this event comes from EventDispachter
+        private bool OnGameTurn(CommonEvent eventObj)
+        {
+            return FSM.onMessage(eventObj, out _);
+        }
+
+        //this event may from collision module
+        private void OnHurt()
+        {
+            Health -= 10f;
+            FSM.onMessage(new SelfEvent(SelfEvent.ID.onHurt), out _);
+        }
+
+        //this event may from animation module
+        private void OnAttackEnd()
+        {
+            FSM.onMessage(new SelfEvent(SelfEvent.ID.onAttackEnd), out _);
+        }
+
+        #endregion
+
+        #region Action Layer, called by fsm
+
+        public void DoIdle()
+        {
+            //logic do sth
+            //animator do sth
+        }
+
+        public void DoAttack()
+        {
+            //logic do sth
+            //animator do sth
+        }
+
+        public void DoDie()
+        {
+            //Destroy(gameObject);
+        }
+
+        #endregion
+
     }
 }

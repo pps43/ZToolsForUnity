@@ -99,7 +99,7 @@ namespace ZTools.FSM
             if (!_isRunning)
             {
                 _isRunning = true;
-                _curState.enter(_owner, null);
+                _curState.Enter(_owner, null);
             }
         }
 
@@ -107,7 +107,7 @@ namespace ZTools.FSM
         {
             if (_isRunning)
             {
-                _curState.exit(_owner);
+                _curState.Exit(_owner);
                 _isRunning = false;
             }
         }
@@ -128,8 +128,8 @@ namespace ZTools.FSM
                 }
                 else
                 {
-                    if (_curState != null) { _curState.update(_owner); }
-                    if (_globalState != null) { _globalState.update(_owner); }
+                    if (_curState != null) { _curState.Update(_owner); }
+                    if (_globalState != null) { _globalState.Update(_owner); }
                 }
             }
         }
@@ -146,8 +146,8 @@ namespace ZTools.FSM
             msgRet = null;
             if (_isRunning)
             {
-                if (_curState != null) { msgRet = _curState.onMessage(_owner, innerMsg); }
-                if (_globalState != null) { _globalState.onMessage(_owner, innerMsg); }
+                if (_curState != null) { msgRet = _curState.OnMessage(_owner, innerMsg); }
+                if (_globalState != null) { _globalState.OnMessage(_owner, innerMsg); }
             }
             return false;
         }
@@ -161,8 +161,8 @@ namespace ZTools.FSM
             msgRetGlobal = null;
             if (_isRunning)
             {
-                if (_curState != null) { msgRet = _curState.onMessage(_owner, innerMsg); }
-                if (_globalState != null) { msgRetGlobal = _globalState.onMessage(_owner, innerMsg); }
+                if (_curState != null) { msgRet = _curState.OnMessage(_owner, innerMsg); }
+                if (_globalState != null) { msgRetGlobal = _globalState.OnMessage(_owner, innerMsg); }
             }
             return false;
         }
@@ -173,8 +173,8 @@ namespace ZTools.FSM
             msgRet = null;
             if (_isRunning)
             {
-                if (_curState != null) { msgRet = _curState.onMessage(_owner, outerMsg); }
-                if (_globalState != null) { _globalState.onMessage(_owner, outerMsg); }
+                if (_curState != null) { msgRet = _curState.OnMessage(_owner, outerMsg); }
+                if (_globalState != null) { _globalState.OnMessage(_owner, outerMsg); }
             }
             return false;
         }
@@ -186,8 +186,8 @@ namespace ZTools.FSM
             msgRetGlobal = null;
             if (_isRunning)
             {
-                if (_curState != null) { msgRet = _curState.onMessage(_owner, outerMsg); }
-                if (_globalState != null) { msgRetGlobal = _globalState.onMessage(_owner, outerMsg); }
+                if (_curState != null) { msgRet = _curState.OnMessage(_owner, outerMsg); }
+                if (_globalState != null) { msgRetGlobal = _globalState.OnMessage(_owner, outerMsg); }
             }
             return false;
         }
@@ -232,8 +232,8 @@ namespace ZTools.FSM
 
             ZLog.verbose(_owner.ToString() + ": " + _lastSate.ToString() + " -> " + _curState.ToString());
 
-            _lastSate.exit(_owner);
-            _curState.enter(_owner, param);
+            _lastSate.Exit(_owner);
+            _curState.Enter(_owner, param);
         }
 
         public void revertState()

@@ -8,13 +8,13 @@ namespace ZTools.Game
     /// Manage a group of [T]: Create/Destroy, Init/UnInit,
     /// Access by GamePlay singleton. e.g. GamePlay.Instance.xxxManager
     /// 
-    /// [ObjectTypeEnum] means differenct prefabs that can be create.
-    /// e.g. EnemyManager can Generate different types of enemies identified by EnemyType Enum.
+    /// [TEnum] means differenct prefabs that can be create.
+    /// e.g. EnemyManager<EnemyType, Enemy> can Generate different types of enemies identified by EnemyType Enum.
     /// </summary>
-    public class BaseObjectManager<T, ENUM> where T : BaseObject where ENUM : struct, IConvertible
+    public abstract class BaseObjectManager<TEnum, T> where T : BaseObject where TEnum : struct, IConvertible
     {
         protected Dictionary<ulong, T> _allObject = null;
-        protected BaseObjectFactory<T> _objectFactory = null;
+        protected BaseObjectFactory<TEnum, T> _objectFactory = null;
         public int ActorNum { get { return _allObject?.Count ?? 0; } }
 
 
@@ -22,7 +22,7 @@ namespace ZTools.Game
         /// if not factory assigned, this manager is unable to generate new actor.
         /// </summary>
         /// <param name="factory"></param>
-        public virtual void Init(BaseObjectFactory<T> factory = null)
+        public virtual void Init(BaseObjectFactory<TEnum, T> factory = null)
         {
             _objectFactory = factory;
             _allObject = new Dictionary<ulong, T>();
@@ -40,7 +40,7 @@ namespace ZTools.Game
         }
 
 
-        public virtual T Generate(ENUM objType, Transform parent = null, Vector3 pos = default, bool isLocalPos = true)
+        public virtual T Generate(TEnum objType, Transform parent = null, Vector3 pos = default, bool isLocalPos = true)
         {
             if (_objectFactory != null)
             {
@@ -60,7 +60,10 @@ namespace ZTools.Game
             {
                 _allObject.Add(obj.GUID, obj);
                 obj.DisposeEvent += Remove;  //will trigger when actor Dispose()
-                obj.Init();
+                if(!obj.HasInit)
+                {
+                    obj.Init();
+                }
             }
         }
 

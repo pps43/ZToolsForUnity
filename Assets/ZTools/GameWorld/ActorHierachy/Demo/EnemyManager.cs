@@ -1,17 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ZTools.Game;
 
-public class EnemyManager : MonoBehaviour
+namespace ZTools.Demo
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
+    public class EnemyManager : BaseObjectManager<EnemyType, Enemy>
     {
         
     }

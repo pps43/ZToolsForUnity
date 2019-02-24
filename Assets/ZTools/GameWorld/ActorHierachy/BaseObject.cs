@@ -4,6 +4,11 @@ using ZTools.DebugUtil;
 
 namespace ZTools.Game
 {
+    class InitException : ApplicationException
+    {
+        public InitException(string msg) : base(msg) { }
+    }
+
     /// <summary>
     /// Base class of a individual game object, 
     /// which has an Guid, and need to be managed (Init/UnInit, Create/Destroy) in your Game.
@@ -14,33 +19,40 @@ namespace ZTools.Game
     /// which means BaseObject should take care of itself.
     /// 
     /// TypeID is used in object pool to identify object's sub-type.
-    /// For example, Enemy may have an enum EnemyType field called 'etype', we can override TypeNum as:
-    /// public override int TypeID => (int)etype
+    /// For example, Enemy may have an enum EnemyType field called 'type', we can override TypeNum as:
+    /// public override int TypeID => (int)type
     /// </summary>
-    public abstract class BaseObject: MonoBehaviour
+    public abstract class BaseObject : MonoBehaviour
     {
         public ulong GUID { get; private set; }
         public abstract int TypeID { get; }
         public bool HasInit { get; private set; }
 
         public event Action<ulong> DisposeEvent;
-        
 
         #region Init/UnInit
 
-        
+
         public virtual void Init()
         {
-            if (HasInit) { ZLog.error(gameObject.name, "cannot Init twice!"); }
+            if (HasInit)
+            {
+                throw new InitException(gameObject.name + " cannot Init twice!");
+            }
+
             HasInit = true;
 
             // register event listener, init children, etc
         }
 
-        
+
         public virtual void UnInit()
         {
-            if (!HasInit) { ZLog.error(gameObject.name, "cannot UnInit twice!"); }
+            if (!HasInit)
+            {
+                throw new InitException(gameObject.name + " cannot UnInit twice!");
+            }
+
             HasInit = false;
 
             // do: unregister event listener, uninit children
@@ -48,27 +60,18 @@ namespace ZTools.Game
 
         #endregion
 
-
-        #region Get/Set
-
-        #endregion
-
-
-        #region Event
-
-        #endregion
-
+        
 
         /// <summary>
         /// call this rather than destroy.
         /// </summary>
         protected void Dispose()
         {
-            if (!HasInit) { ZLog.warn(gameObject.name, "has't Init. Dispose() makes no sense.");  return; }
+            if (!HasInit) { ZLog.warn(gameObject.name, "has't Init. Dispose() makes no sense."); return; }
 
             if (DisposeEvent != null)
             {
-                if(DisposeEvent.GetInvocationList().Length > 1)
+                if (DisposeEvent.GetInvocationList().Length > 1)
                 {
                     ZLog.error(gameObject.name, "disposeEvent should only have one listener(Manager)");
                 }

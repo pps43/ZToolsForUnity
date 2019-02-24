@@ -1,18 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ZTools.Game;
 
-public class EnemyFactory : MonoBehaviour
+namespace ZTools.Demo
 {
-    // Start is called before the first frame update
-    void Start()
+    public class EnemyFactory : BaseObjectFactory<EnemyType, Enemy>
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        protected override void ListToDic()
+        {
+            if (_prefabList != null)
+            {
+                for (int i = 0; i < _prefabList.Length; i++)
+                {
+                    _prefabDic.Add(_prefabList[i].TypeID, _prefabList[i]);
+                }
+            }
+        }
     }
 }
