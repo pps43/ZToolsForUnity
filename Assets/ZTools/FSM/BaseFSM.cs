@@ -32,7 +32,7 @@ namespace ZTools.FSM
     /// <list type="bullet">
     /// <item>
     /// Provide two type of msg: P, Q. This is commonly defined as local msgtype as P,
-    /// common msgtype as Q. This is to reduce global contamination.
+    /// common msgtype as Q. This is to reduce global msgType contamination.
     /// </item>
     /// <item>
     /// Change state is done in next frame to ensure certainty of state. 
@@ -87,7 +87,6 @@ namespace ZTools.FSM
             _isRunning = false;
             _cachedStates = new List<CachedStateToChange>();
             _owner = owner;
-            _owner.updateEvent += update;
             _lastSate = state;
             _curState = state;
             _globalState = globalState;
@@ -98,9 +97,20 @@ namespace ZTools.FSM
         {
             if (!_isRunning)
             {
+                _owner.updateEvent += update;
                 _isRunning = true;
                 _curState.Enter(_owner, null);
             }
+        }
+
+        public void pause()
+        {
+            _isRunning = false;
+        }
+
+        public void resume()
+        {
+            _isRunning = true;
         }
 
         public void stop()
@@ -108,6 +118,7 @@ namespace ZTools.FSM
             if (_isRunning)
             {
                 _curState.Exit(_owner);
+                _owner.updateEvent -= update;
                 _isRunning = false;
             }
         }
