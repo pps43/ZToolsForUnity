@@ -7,6 +7,7 @@ namespace ZTools.Game.CollisionUtil
 {
     public enum ColliderType
     {
+        none,
         hero,
         sword,
         enemy,
@@ -15,15 +16,33 @@ namespace ZTools.Game.CollisionUtil
     /// <summary>
     /// Collision filtering takes 2 step:
     /// 1. layer and collision matrix defined in project settings.
-    /// 2. this script
+    /// 2. this script, to be specific, TypeTest and ExclusiveTest.
+    /// 
+    /// However, there is dispute in step 2's necessity and redundance,  
+    /// since listerners of OnGameCollisionEnter event always need to 
+    /// use "if" to filter different types for different game logic.
     /// </summary>
     public class CollisionAbility : BaseAbility
     {
 
         /// <summary>
-        /// 2D and 3D cannot collide together.
+        /// 2D and 3D objects cannot collide together.
         /// </summary>
         public bool Is2DMode = true;
+
+        /// <summary>
+        /// Use user-defined collision matrix to filter collision.
+        /// You can turn it off if you find it's annoying.
+        /// </summary>
+        public bool UseTypeTest = true;
+
+        /// <summary>
+        /// The value "true" means this object can only be in one pair of collision.
+        /// For example,
+        /// A collide with B and C simultaneously, which means there are 2 pair of collisions.
+        /// If we use exclusive test, A will only handle the first collision with B or C.
+        /// </summary>
+        public bool UseExclusiveTest = false;
 
         /// <summary>
         /// Turn it on to receive both collison and trigger event.
@@ -48,7 +67,7 @@ namespace ZTools.Game.CollisionUtil
         public event Action<CollisionAbility> OnGameCollisionExit;
 
         public ColliderType Type { get { return _type; } }
-        [SerializeField] private ColliderType _type = ColliderType.hero; //modify in editor
+        [SerializeField] private ColliderType _type = ColliderType.none; //modify in editor
 
         public override void Init(BaseObject ownerObject)
         {
@@ -166,27 +185,28 @@ namespace ZTools.Game.CollisionUtil
 
         private bool CanCollideWith(CollisionAbility other)
         {
-            //extra protection
             if (!HasInit || other == null) { return false; }
 
-            //bool isTypeCompatible = other.colliderTypeBit & this.colliderMask) > 0 ? true : false;
-            bool isTypeCompatible = GamePlay.instance.collisionManager.CanPassTypeTest(this, other); // TODO do we need GamePlay ref?
+            bool passTypeTest = UseTypeTest ?
+                GamePlay.instance.collisionManager.CanPassTypeTest(this, other) : true;
 
-            if (isTypeCompatible)
+            if (passTypeTest)
             {
-                bool isPassExclusiveTest = GamePlay.instance.collisionManager.CanPassExclusiveTest(this, other);
-                if(isPassExclusiveTest)
+                bool passExclusiveTest = UseExclusiveTest?
+                    GamePlay.instance.collisionManager.CanPassExclusiveTest(this, other): true;
+
+                if(passExclusiveTest)
                 {
                     return true;
                 }
                 else
                 {
-                    ZLog.verbose(owner.name, "fail to pass exclusive test with:", other.owner.name);
+                    ZLog.verbose(owner.name, "fails Exclusive Test with:", other.owner.name);
                 }
             }
             else
             {
-                ZLog.verbose(owner.name, "cannot collide with type:", other.Type.ToString());
+                ZLog.verbose(owner.name, "fails Type Test with type:", other.Type.ToString());
             }
             return false;
         }
