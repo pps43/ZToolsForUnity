@@ -7,10 +7,8 @@ namespace ZTools.Game
     /// Base class of an actor,
     /// which can be equiped with some BaseAbilities, and an FSM as AI.
     /// </summary>
-    public abstract class BaseActor : BaseObject, IUpdatable
+    public abstract class BaseActor : BaseObject
     {
-        public event Action updateEvent;
-
         public override void Init()
         {
             base.Init();
@@ -27,9 +25,5 @@ namespace ZTools.Game
             //stop fsm
         }
 
-        void LateUpdate()
-        {
-            updateEvent?.Invoke();
-        }
     }
 }

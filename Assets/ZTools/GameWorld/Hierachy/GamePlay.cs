@@ -9,10 +9,8 @@ namespace ZTools.Game
     /// Global singleton as an etry point, manage in-game modules/submanagers.
     /// GamePlay itself has a FSM, which include loading, playing, pause, exit state.
     /// </summary>
-    public class GamePlay : MonoBehaviour, IUpdatable
+    public class GamePlay : MonoBehaviour
     {
-        public event Action updateEvent;
-
         public static GamePlay instance;
 
         //public InputManager inputManager { get; private set; }
@@ -37,7 +35,6 @@ namespace ZTools.Game
 
         private void Update()
         {
-            updateEvent?.Invoke();
             eventDispatcher.update();
         }
 

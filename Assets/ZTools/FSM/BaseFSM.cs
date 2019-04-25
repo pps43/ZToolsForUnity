@@ -5,25 +5,20 @@ using ZTools.DebugUtil;
 namespace ZTools.FSM
 {
     /// <summary>
-    /// Invoke updateEvent to fuel FSM
+    /// 方便 FSMManager 管理
     /// </summary>
-    public interface IUpdatable
+    public abstract class BaseFSM
     {
-        event Action updateEvent;
+        public abstract bool isRunning { get;}
+        public abstract void start();
+        public abstract void pause();
+        public abstract void resume();
+        public abstract void stop();//dispose
+        public abstract void update();
+
+        public Action<BaseFSM> disposeEvent;
     }
 
-    /// <summary>
-    /// Use this to create FSM. Ready to start.
-    /// It's convenient because it infers generic type from parameters.
-    /// </summary>
-    public static class FSMFactory
-    {
-        public static FSM<T, P, Q> createFSM <T,P,Q> (T owner, BaseState<T, P, Q> state, BaseState<T, P, Q> globalState) where T : IUpdatable
-        {
-            var newFSM = new FSM<T, P, Q>(owner, state, globalState);
-            return newFSM;
-        }
-    }
 
     /// <summary>
     /// FSM (Finite state machine)
@@ -57,14 +52,15 @@ namespace ZTools.FSM
     /// </para>
     /// 
     /// </summary>
-    public class FSM<T,P,Q> where T : IUpdatable
+    public class FSM<T, P, Q> : BaseFSM where T : class
     {
         private T _owner;
-        private BaseState<T,P,Q> _curState;//current state
-        private BaseState<T,P,Q> _lastSate;//previous state
-        private BaseState<T,P,Q> _globalState;//logic for all state
+        private BaseState<T, P, Q> _curState;//current state
+        private BaseState<T, P, Q> _lastSate;//previous state
+        private BaseState<T, P, Q> _globalState;//logic for all state
 
         private bool _needChangeState;
+        public override bool isRunning => _isRunning;
         private bool _isRunning;
 
         public class CachedStateToChange
@@ -79,7 +75,7 @@ namespace ZTools.FSM
         }
 
         //change state requests in same frame will be cached. Then they will be executed in next frame.
-        List<CachedStateToChange> _cachedStates; 
+        List<CachedStateToChange> _cachedStates;
 
 
         public FSM(T owner, BaseState<T, P, Q> state, BaseState<T, P, Q> globalState)
@@ -93,38 +89,37 @@ namespace ZTools.FSM
             _needChangeState = false;
         }
 
-        public void start()
+        public override void start()
         {
             if (!_isRunning)
             {
-                _owner.updateEvent += update;
                 _isRunning = true;
                 _curState.Enter(_owner, null);
             }
         }
 
-        public void pause()
+        public override void pause()
         {
             _isRunning = false;
         }
 
-        public void resume()
+        public override void resume()
         {
             _isRunning = true;
         }
 
-        public void stop()
+        public override void stop()
         {
             if (_isRunning)
             {
                 _curState.Exit(_owner);
-                _owner.updateEvent -= update;
                 _isRunning = false;
+                disposeEvent?.Invoke(this);
             }
         }
 
-        //TODO: better to call before next frame, or at the end of current frame.
-        private void update()
+        //will call at the end of current frame by FSMManager
+        public override void update()
         {
             if (_isRunning)
             {
@@ -204,7 +199,7 @@ namespace ZTools.FSM
         }
 
 
-        public void changeState(BaseState<T,P,Q> newState,object param = null)
+        public void changeState(BaseState<T, P, Q> newState, object param = null)
         {
             //ZLog.log(_owner.ToString() + " try change State to:" + newState.ToString());
             if (_isRunning)
@@ -216,7 +211,7 @@ namespace ZTools.FSM
 
         private void realChangeState(BaseState<T, P, Q> newState, object param = null)
         {
-            if(newState == null)
+            if (newState == null)
             {
                 ZLog.error(_owner.ToString(), "cannot change state to null");
                 return;
@@ -229,7 +224,7 @@ namespace ZTools.FSM
 
             if (newState.GetType().Equals(_curState.GetType()))
             {
-                ZLog.warn(_owner.ToString(), "cannot change to the same state:" , _curState.ToString());
+                ZLog.warn(_owner.ToString(), "cannot change to the same state:", _curState.ToString());
                 return;
             }
 
@@ -256,7 +251,6 @@ namespace ZTools.FSM
             }
         }
 
-        [Obsolete("真的需要这种方法吗？")]
         public bool isInState(Type type)
         {
             return _curState.GetType().Equals(type);

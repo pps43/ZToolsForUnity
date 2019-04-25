@@ -28,7 +28,7 @@ namespace ZTools.Demo
             base.Init();
             Health = 100f;
             _eventHelper.addListener(EventID.onTurn, OnGameTurn);
-            FSM = FSMFactory.createFSM(this, new IdleState(), new GlobalState());
+            FSM = FSMManager.instance.createFSM(this, new IdleState(), new GlobalState());
             FSM.start();
         }
 
