@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using ZTools.DebugUtil;
 
 namespace ZTools.Game.CollisionUtil
 {
@@ -58,7 +59,15 @@ namespace ZTools.Game.CollisionUtil
             if (me == null || other == null)
                 return false;
 
-            return _collisionConfig[(int)me.Type, (int)other.Type];
+            if(_collisionConfig != null)
+            {
+                return _collisionConfig[(int)me.Type, (int)other.Type];
+            }
+            else
+            {
+                ZLog.warn("no collison config file attached.");
+                return true;
+            }
         }
 
         /// <summary>

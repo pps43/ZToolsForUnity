@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace ZTools.Game.CollisionUtil
 {
+    /// <summary>
+    /// customized collision matrix.
+    /// Better not use this because its redundancy will lead to endless confusion.
+    /// </summary>
     [CreateAssetMenu(fileName = "NewCollisonConfig", menuName = "ZTools/CollisionConfig")]
     public class CollisionConfig : ScriptableObject
     {

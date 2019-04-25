@@ -5,6 +5,10 @@ using ZTools.DebugUtil;
 
 namespace ZTools.Game.CollisionUtil
 {
+    /// <summary>
+    /// You may use this enum to identify colliders,
+    /// or just delete this and use tags instead.
+    /// </summary>
     public enum ColliderType
     {
         none,
@@ -15,12 +19,14 @@ namespace ZTools.Game.CollisionUtil
 
     /// <summary>
     /// Collision filtering takes 2 step:
-    /// 1. layer and collision matrix defined in project settings.
-    /// 2. this script, to be specific, TypeTest and ExclusiveTest.
+    /// 1. Use Layer collision matrix defined in project settings.
+    /// 2. TypeTest (Optional) using self-defined matrix.
+    /// 3. ExclusiveTest (Optional).
     /// 
     /// However, there is dispute in step 2's necessity and redundance,  
     /// since listerners of OnGameCollisionEnter event always need to 
     /// use "if" to filter different types for different game logic.
+    /// 
     /// </summary>
     public class CollisionAbility : BaseAbility
     {
