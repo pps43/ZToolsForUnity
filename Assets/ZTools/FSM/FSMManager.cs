@@ -55,6 +55,8 @@ namespace ZTools.FSM
                 idx = _allFSMList.IndexOf(fsm);
                 if (idx >= 0)
                 {
+                    fsm.disposeEvent -= onFSMStop;
+
                     if (!fsm.isRunning)
                     {
                         _allFSMList.RemoveAt(idx);
