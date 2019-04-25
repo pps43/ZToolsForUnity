@@ -9,6 +9,7 @@ namespace ZTools.Demo
 {
     public enum EnemyType
     {
+        none,
         walker,
         flyer,
     }
@@ -16,7 +17,7 @@ namespace ZTools.Demo
 
     public class Enemy : BaseActor
     {
-        [SerializeField] private EnemyType _type;
+        [SerializeField] private EnemyType _type = EnemyType.none;
         public override int TypeID => (int)_type;
 
         public float Health { get; private set; }

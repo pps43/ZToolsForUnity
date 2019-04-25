@@ -46,7 +46,7 @@ namespace ZTools.Game.CollisionUtil
 
         private static HashSet<CollisionPairInfo> _beInCollisionCache = new HashSet<CollisionPairInfo>();
 
-        [SerializeField] private CollisionConfig _collisionConfig;
+        [SerializeField] private CollisionConfig _collisionConfig = null;
 
         //clear before next frame
         void LateUpdate()

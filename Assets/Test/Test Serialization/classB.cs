@@ -6,7 +6,6 @@ public class classB : MonoBehaviour
 {
     private void Awake()
     {
-        classA.instance.dosth();
     }
     
 }
