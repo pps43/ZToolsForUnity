@@ -9,7 +9,7 @@ namespace ZTools.FSM
     /// </summary>
     public abstract class BaseFSM
     {
-        public abstract bool isRunning { get;}
+        public abstract bool isRunning { get; }
         public abstract void start();
         public abstract void pause();
         public abstract void resume();
@@ -128,6 +128,10 @@ namespace ZTools.FSM
                     _needChangeState = false;
                     for (int i = 0; i < _cachedStates.Count; i++)
                     {
+                        if (_cachedStates.Count > 1)
+                        {
+                            ZLog.warn("more than one statechange in one frame. Notice if there is ambiguity!");
+                        }
                         realChangeState(_cachedStates[i].state, _cachedStates[i].stateData);
                     }
                     _cachedStates.Clear();
@@ -141,62 +145,42 @@ namespace ZTools.FSM
         }
 
         /// <summary>
-        /// This function provide a extra msgRet from _curState.
-        /// If you don't care about it, use: onMessage(msg, out _);
+        /// dispatch a message of type P to fsm and get a return msg.
         /// </summary>
         /// <param name="innerMsg"></param>
-        /// <param name="msgRet"></param>
+        /// <param name="retFromGlobal"></param>
         /// <returns></returns>
-        public bool onMessage(P innerMsg, out object msgRet)
+        public object onMessage(P innerMsg, bool retFromGlobal = false)
         {
-            msgRet = null;
-            if (_isRunning)
-            {
-                if (_curState != null) { msgRet = _curState.OnMessage(_owner, innerMsg); }
-                if (_globalState != null) { _globalState.OnMessage(_owner, innerMsg); }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// This function provide a extra msgRetGlobal from _globalState.
-        /// </summary>
-        public bool onMessage(P innerMsg, out object msgRet, out object msgRetGlobal)
-        {
-            msgRet = null;
-            msgRetGlobal = null;
+            object msgRet = null;
+            object msgRetGlobal = null;
             if (_isRunning)
             {
                 if (_curState != null) { msgRet = _curState.OnMessage(_owner, innerMsg); }
                 if (_globalState != null) { msgRetGlobal = _globalState.OnMessage(_owner, innerMsg); }
             }
-            return false;
+            return retFromGlobal ? msgRetGlobal : msgRet;
         }
 
-        /// This is for type-Q message
-        public bool onMessage(Q outerMsg, out object msgRet)
-        {
-            msgRet = null;
-            if (_isRunning)
-            {
-                if (_curState != null) { msgRet = _curState.OnMessage(_owner, outerMsg); }
-                if (_globalState != null) { _globalState.OnMessage(_owner, outerMsg); }
-            }
-            return false;
-        }
 
-        /// This is for type-Q message
-        public bool onMessage(Q outerMsg, out object msgRet, out object msgRetGlobal)
+        /// <summary>
+        /// dispatch a message of type Q to fsm and get a return msg.
+        /// </summary>
+        /// <param name="outerMsg"></param>
+        /// <param name="retFromGlobal"></param>
+        /// <returns></returns>
+        public object onMessage(Q outerMsg, bool retFromGlobal = false)
         {
-            msgRet = null;
-            msgRetGlobal = null;
+            object msgRet = null;
+            object msgRetGlobal = null;
             if (_isRunning)
             {
                 if (_curState != null) { msgRet = _curState.OnMessage(_owner, outerMsg); }
                 if (_globalState != null) { msgRetGlobal = _globalState.OnMessage(_owner, outerMsg); }
             }
-            return false;
+            return retFromGlobal ? msgRetGlobal : msgRet;
         }
+
 
 
         public void changeState(BaseState<T, P, Q> newState, object param = null)
@@ -231,6 +215,7 @@ namespace ZTools.FSM
             if (_owner == null)
             {
                 ZLog.error("_owner = null");
+                return;
             }
 
             _lastSate = _curState;

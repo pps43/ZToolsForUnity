@@ -45,20 +45,21 @@ namespace ZTools.Demo
         //this event comes from EventDispachter
         private bool OnGameTurn(CommonEvent eventObj)
         {
-            return FSM.onMessage(eventObj, out _);
+            FSM.onMessage(eventObj);
+            return false;
         }
 
         //this event may from collision module
         private void OnHurt()
         {
             Health -= 10f;
-            FSM.onMessage(new SelfEvent(SelfEvent.ID.onHurt), out _);
+            FSM.onMessage(new SelfEvent(SelfEvent.ID.onHurt));
         }
 
         //this event may from animation module
         private void OnAttackEnd()
         {
-            FSM.onMessage(new SelfEvent(SelfEvent.ID.onAttackEnd), out _);
+            FSM.onMessage(new SelfEvent(SelfEvent.ID.onAttackEnd));
         }
 
         #endregion
