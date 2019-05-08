@@ -23,33 +23,20 @@ namespace ZTools.FSM
     /// <summary>
     /// FSM (Finite state machine)
     /// 
-    /// <para name="Feature">
-    /// <list type="bullet">
-    /// <item>
     /// Provide two type of msg: P, Q. This is commonly defined as local msgtype as P,
     /// common msgtype as Q. This is to reduce global msgType contamination.
-    /// </item>
-    /// <item>
-    /// Change state is done in next frame to ensure certainty of state. 
-    /// If not, you can get different state in one frame, and this may cause confusion.
-    /// </item>
-    /// <item>
-    /// All onMessage function return a bool value.
-    /// This is used to be compatible with ZTool.Event module, 
-    /// whose event handler always has a bool ret-value to identify whether to "eat" this event.
-    /// </item>
-    /// </list>
-    /// </para>
     /// 
-    /// <para name="How to use">
-    /// <list type="bullet">
-    /// <item> fsm = FSMFactory.createFSM(owner, new IdleState(), new GlobalState());</item>
-    /// <item> fsm.start();</item>
-    /// <item> fsm.onMessage(new TypePEvent(), out _);</item>
-    /// <item> fsm.onMessage(new TypeQEvent(), out _);</item>
-    /// <item> fsm.stop();</item>
-    /// </list>
-    /// </para>
+    /// Change state is done immediately rather than next frame to keep simplicity and robustness.
+    /// 
+    /// All onMessage function return an object.
+    /// This is useful when you want to get some data immediately.
+    /// 
+    /// -----Example code----
+    /// fsm = FSMFactory.createFSM(owner, new IdleState(), new GlobalState());
+    /// fsm.start();
+    /// fsm.onMessage(new TypePEvent());
+    /// fsm.onMessage(new TypeQEvent());
+    /// fsm.stop();
     /// 
     /// </summary>
     public class FSM<T, P, Q> : BaseFSM where T : class
@@ -59,34 +46,17 @@ namespace ZTools.FSM
         private BaseState<T, P, Q> _lastSate;//previous state
         private BaseState<T, P, Q> _globalState;//logic for all state
 
-        private bool _needChangeState;
         public override bool isRunning => _isRunning;
         private bool _isRunning;
-
-        public class CachedStateToChange
-        {
-            public BaseState<T, P, Q> state;
-            public object stateData;
-            public CachedStateToChange(BaseState<T, P, Q> stateToCache, object data)
-            {
-                state = stateToCache;
-                stateData = data;
-            }
-        }
-
-        //change state requests in same frame will be cached. Then they will be executed in next frame.
-        List<CachedStateToChange> _cachedStates;
 
 
         public FSM(T owner, BaseState<T, P, Q> state, BaseState<T, P, Q> globalState)
         {
             _isRunning = false;
-            _cachedStates = new List<CachedStateToChange>();
             _owner = owner;
             _lastSate = state;
             _curState = state;
             _globalState = globalState;
-            _needChangeState = false;
         }
 
         public override void start()
@@ -118,29 +88,12 @@ namespace ZTools.FSM
             }
         }
 
-        //will call at the end of current frame by FSMManager
         public override void update()
         {
             if (_isRunning)
             {
-                if (_needChangeState)
-                {
-                    _needChangeState = false;
-                    for (int i = 0; i < _cachedStates.Count; i++)
-                    {
-                        if (_cachedStates.Count > 1)
-                        {
-                            ZLog.warn("more than one statechange in one frame. Notice if there is ambiguity!");
-                        }
-                        realChangeState(_cachedStates[i].state, _cachedStates[i].stateData);
-                    }
-                    _cachedStates.Clear();
-                }
-                else
-                {
-                    if (_curState != null) { _curState.Update(_owner); }
-                    if (_globalState != null) { _globalState.Update(_owner); }
-                }
+                if (_curState != null) { _curState.Update(_owner); }
+                if (_globalState != null) { _globalState.Update(_owner); }
             }
         }
 
@@ -181,20 +134,14 @@ namespace ZTools.FSM
             return retFromGlobal ? msgRetGlobal : msgRet;
         }
 
-
-
-        public void changeState(BaseState<T, P, Q> newState, object param = null)
+        private void changeState(BaseState<T, P, Q> newState, object param = null)
         {
-            //ZLog.log(_owner.ToString() + " try change State to:" + newState.ToString());
-            if (_isRunning)
+            if (!isRunning)
             {
-                _needChangeState = true;
-                _cachedStates.Add(new CachedStateToChange(newState, param));
+                ZLog.error("Cannot change state, FSM is not runnning");
+                return;
             }
-        }
 
-        private void realChangeState(BaseState<T, P, Q> newState, object param = null)
-        {
             if (newState == null)
             {
                 ZLog.error(_owner.ToString(), "cannot change state to null");
