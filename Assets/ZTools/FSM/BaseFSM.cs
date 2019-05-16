@@ -28,6 +28,8 @@ namespace ZTools.FSM
     /// 
     /// Change state is done immediately rather than next frame to keep simplicity and robustness.
     /// 
+    /// Notice that one state may not call update() if time interval between enter() and exit() is less than one frame interval.
+    /// 
     /// All onMessage function return an object.
     /// This is useful when you want to get some data immediately.
     /// 
