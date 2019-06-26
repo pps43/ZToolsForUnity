@@ -14,9 +14,9 @@ namespace ZTools.ActionSequence
         private static List<ActionSequence> _allSeq = new List<ActionSequence>();
         private static ActionSequenceManager _instance;
 
-        public static ActionSequence getActionSequence()
+        public static ActionSequence create()
         {
-            if(_instance == null)
+            if (_instance == null)
             {
                 GameObject obj = new GameObject
                 {
@@ -28,7 +28,7 @@ namespace ZTools.ActionSequence
 
             for (int i = 0; i < _allSeq.Count; i++)
             {
-                if(_allSeq[i].isRunning()== false)
+                if (_allSeq[i].isRunning() == false)
                 {
                     _allSeq[i].Stop();
                     return _allSeq[i];

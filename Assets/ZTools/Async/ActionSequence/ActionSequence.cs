@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Runtime.InteropServices;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -9,8 +10,9 @@ namespace ZTools.ActionSequence
     /// Chains some actions sequentially. 
     /// 
     /// How to use:
-    /// ActionSequence seq = ActionSequenceManager.getActionSequence();
-    /// seq.Then(doSth).Then(doCoroutine());
+    /// ActionSequence seq = ActionSequenceManager.create();
+    /// seq.Then(()=> dosth)).Then(doCoroutine()).Then(new WaitForSeconds(1f));
+    /// 
     /// 
     /// Support action type:
     /// normal function、IEnumerator、YieldInstruction、CustomYieldInstruction.
@@ -75,7 +77,7 @@ namespace ZTools.ActionSequence
 
         public ActionSequence Then(YieldInstruction yieldInstruction)
         {
-            if(yieldInstruction != null)
+            if (yieldInstruction != null)
             {
                 ActionItem item = new ActionItem
                 {
@@ -90,7 +92,7 @@ namespace ZTools.ActionSequence
 
         public ActionSequence Then(CustomYieldInstruction customYield)
         {
-            if(customYield != null)
+            if (customYield != null)
             {
                 ActionItem item = new ActionItem
                 {
@@ -131,7 +133,7 @@ namespace ZTools.ActionSequence
             return this;
         }
 
-        public ActionSequence Then(Action<object,Action> func, object param, Action myCallBack)
+        public ActionSequence Then(Action<object, Action> func, object param, Action myCallBack)
         {
             if (func != null)
             {
@@ -188,11 +190,11 @@ namespace ZTools.ActionSequence
                 {
                     StartCoroutine(doItemCoroutine(item));
                 }
-                else if(item.yieldInstruction != null)
+                else if (item.yieldInstruction != null)
                 {
                     StartCoroutine(doItemYieldInstruction(item));
                 }
-                else if(item.customYield != null)
+                else if (item.customYield != null)
                 {
                     StartCoroutine(doItemCustomYieldInstruction(item));
                 }
