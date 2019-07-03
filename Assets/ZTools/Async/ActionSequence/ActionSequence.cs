@@ -48,18 +48,28 @@ namespace ZTools.ActionSequence
 
         private Queue<ActionItem> _actionSequence = new Queue<ActionItem>();
 
+        private bool _isFnished = false;//It should be regard as running just after creation
+
         #region public func
 
-        public bool isRunning()
+        public bool IsRunning()
         {
-            return _actionSequence.Count > 0;
+            return !_isFnished;
         }
+
+
+        public void Run()
+        {
+            DoNextAction();
+        }
+
 
         public void Stop()
         {
             StopAllCoroutines();
             _actionSequence.Clear();
         }
+
 
         public ActionSequence Then(IEnumerator enumerator)
         {
@@ -70,10 +80,11 @@ namespace ZTools.ActionSequence
                     name = enumerator.ToString(),
                     coroutine = enumerator
                 };
-                enqueue(item);
+                Enqueue(item);
             }
             return this;
         }
+
 
         public ActionSequence Then(YieldInstruction yieldInstruction)
         {
@@ -84,11 +95,12 @@ namespace ZTools.ActionSequence
                     name = yieldInstruction.ToString(),
                     yieldInstruction = yieldInstruction,
                 };
-                enqueue(item);
+                Enqueue(item);
             }
 
             return this;
         }
+
 
         public ActionSequence Then(CustomYieldInstruction customYield)
         {
@@ -99,10 +111,11 @@ namespace ZTools.ActionSequence
                     name = customYield.ToString(),
                     customYield = customYield,
                 };
-                enqueue(item);
+                Enqueue(item);
             }
             return this;
         }
+
 
         public ActionSequence Then(Action func)
         {
@@ -113,10 +126,11 @@ namespace ZTools.ActionSequence
                     name = func.ToString(),
                     func = func,
                 };
-                enqueue(item);
+                Enqueue(item);
             }
             return this;
         }
+
 
         public ActionSequence Then(Action<object> func, object param1)
         {
@@ -128,10 +142,11 @@ namespace ZTools.ActionSequence
                     funcWithParam = func,
                     param = param1,
                 };
-                enqueue(item);
+                Enqueue(item);
             }
             return this;
         }
+
 
         public ActionSequence Then(Action<object, Action> func, object param, Action myCallBack)
         {
@@ -144,16 +159,20 @@ namespace ZTools.ActionSequence
                     func = myCallBack,
                     param = param,
                 };
-                enqueue(item);
+                Enqueue(item);
             }
             return this;
         }
 
         #endregion
+
+
         #region private func
 
-        private void enqueue(ActionItem item)
+        private void Enqueue(ActionItem item)
         {
+            _isFnished = false;
+
             if (_actionSequence.Count > 0)
             {
                 _actionSequence.Enqueue(item);
@@ -161,11 +180,12 @@ namespace ZTools.ActionSequence
             else
             {
                 _actionSequence.Enqueue(item);
-                doNextAction();
+                DoNextAction();
             }
         }
 
-        private void doNextAction()
+
+        private void DoNextAction()
         {
             if (_actionSequence.Count > 0)
             {
@@ -174,17 +194,17 @@ namespace ZTools.ActionSequence
                 if (item.funcWithParamAndCallBack != null)
                 {
                     item.funcWithParamAndCallBack(item.param, item.func);
-                    finishOne();
+                    FinishOne();
                 }
                 else if (item.funcWithParam != null)
                 {
                     item.funcWithParam(item.param);
-                    finishOne();
+                    FinishOne();
                 }
                 else if (item.func != null)
                 {
                     item.func();
-                    finishOne();
+                    FinishOne();
                 }
                 else if (item.coroutine != null)
                 {
@@ -199,34 +219,37 @@ namespace ZTools.ActionSequence
                     StartCoroutine(doItemCustomYieldInstruction(item));
                 }
             }
-        }
-
-        private void finishOne()
-        {
-            if (_actionSequence.Count > 0)
+            else
             {
-                _actionSequence.Dequeue();
-                //ZLog.log("finish", _actionSequence.Peek().name);
-                doNextAction();
+                _isFnished = true;
             }
         }
+
+
+        private void FinishOne()
+        {
+            DoNextAction();
+        }
+
 
         private IEnumerator doItemCoroutine(ActionItem item)
         {
             yield return item.coroutine;
-            finishOne();
+            FinishOne();
         }
+
 
         private IEnumerator doItemYieldInstruction(ActionItem item)
         {
             yield return item.yieldInstruction;
-            finishOne();
+            FinishOne();
         }
+
 
         private IEnumerator doItemCustomYieldInstruction(ActionItem item)
         {
             yield return item.customYield;
-            finishOne();
+            FinishOne();
         }
         #endregion
 

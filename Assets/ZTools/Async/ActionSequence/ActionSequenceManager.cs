@@ -14,7 +14,8 @@ namespace ZTools.ActionSequence
         private static List<ActionSequence> _allSeq = new List<ActionSequence>();
         private static ActionSequenceManager _instance;
 
-        public static ActionSequence create()
+
+        public static ActionSequence Create()
         {
             if (_instance == null)
             {
@@ -28,9 +29,8 @@ namespace ZTools.ActionSequence
 
             for (int i = 0; i < _allSeq.Count; i++)
             {
-                if (_allSeq[i].isRunning() == false)
+                if (!_allSeq[i].IsRunning())
                 {
-                    _allSeq[i].Stop();
                     return _allSeq[i];
                 }
             }
