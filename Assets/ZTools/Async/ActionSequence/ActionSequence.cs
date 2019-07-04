@@ -1,8 +1,8 @@
-﻿using System.Runtime.InteropServices;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using ZTools.DebugUtil;
 
 namespace ZTools.ActionSequence
 {
@@ -12,7 +12,7 @@ namespace ZTools.ActionSequence
     /// How to use:
     /// ActionSequence seq = ActionSequenceManager.create();
     /// seq.Then(()=> dosth)).Then(doCoroutine()).Then(new WaitForSeconds(1f));
-    /// 
+    /// seq.Run();
     /// 
     /// Support action type:
     /// normal function、IEnumerator、YieldInstruction、CustomYieldInstruction.
@@ -34,6 +34,8 @@ namespace ZTools.ActionSequence
             public object param;
             public float timeOut;  //not used now. in case of blocking
 
+            System.Text.StringBuilder _sb = new System.Text.StringBuilder();
+
             public ActionItem()
             {
                 coroutine = null;
@@ -43,6 +45,39 @@ namespace ZTools.ActionSequence
 
                 param = null;
                 timeOut = -1f;
+            }
+
+
+            public override string ToString()
+            {
+                _sb.Length = 0;
+
+                if (func != null)
+                {
+                    string s = func.Method.Name;
+                    if (s.StartsWith("<"))
+                    {
+                        _sb.Append("Anomymous Func:");
+                    }
+                    _sb.Append(s);
+                }
+                else if (yieldInstruction != null)
+                {
+                    var type = yieldInstruction.GetType();
+                    if (type == typeof(WaitForSeconds))
+                    {
+                        var prop = typeof(WaitForSeconds).GetField("m_Seconds",
+                            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                        var va = prop.GetValue(yieldInstruction);
+                        string s = va.ToString();
+
+                        _sb.Append("WaitForSeconds: ");
+                        _sb.Append(s);
+                    }
+
+                }
+
+                return _sb.ToString();
             }
         }
 
@@ -173,15 +208,9 @@ namespace ZTools.ActionSequence
         {
             _isFnished = false;
 
-            if (_actionSequence.Count > 0)
-            {
-                _actionSequence.Enqueue(item);
-            }
-            else
-            {
-                _actionSequence.Enqueue(item);
-                DoNextAction();
-            }
+            ZLog.log("[", GetInstanceID().ToString(), "] enqueue:", item.ToString());
+
+            _actionSequence.Enqueue(item);
         }
 
 
@@ -190,6 +219,9 @@ namespace ZTools.ActionSequence
             if (_actionSequence.Count > 0)
             {
                 ActionItem item = _actionSequence.Peek();
+                _actionSequence.Dequeue();
+
+                ZLog.log("[", GetInstanceID().ToString(), "] dequeue:", item.ToString());
 
                 if (item.funcWithParamAndCallBack != null)
                 {
@@ -228,6 +260,8 @@ namespace ZTools.ActionSequence
 
         private void FinishOne()
         {
+            //ZLog.log("finishOne, rest action =", _actionSequence.Count.ToString());
+
             DoNextAction();
         }
 
