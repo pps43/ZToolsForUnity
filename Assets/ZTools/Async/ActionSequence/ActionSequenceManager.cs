@@ -4,7 +4,7 @@ using UnityEngine;
 namespace ZTools.ActionSequence
 {
     /// <summary>
-    /// All ActionSequence objects run on this manager, and are reuseable.
+    /// All ActionSequence objects run on this manager, and can be reused if you turn on "reuse".
     /// 
     /// TODO：when gameobject that calls the ActionSequence destroys, ActionSequenceManager should auto finish corresponding ActionSequence. 
     /// So far, the gameobject should take this responsibility.
@@ -14,6 +14,7 @@ namespace ZTools.ActionSequence
         private static List<ActionSequence> _allSeq = new List<ActionSequence>();
         private static ActionSequenceManager _instance;
 
+        public static bool reuse = false;
 
         public static ActionSequence Create()
         {
@@ -27,18 +28,43 @@ namespace ZTools.ActionSequence
                 _instance = obj.AddComponent<ActionSequenceManager>();
             }
 
-            for (int i = 0; i < _allSeq.Count; i++)
+            ActionSequence newSeq = null;
+
+            if (reuse)
             {
-                if (!_allSeq[i].IsRunning())
+                for (int i = 0; i < _allSeq.Count; i++)
                 {
-                    return _allSeq[i];
+                    if (_allSeq[i].isFnished)
+                    {
+                        newSeq = _allSeq[i];
+                        break;
+                    }
                 }
             }
 
-            ActionSequence newSeq = _instance.gameObject.AddComponent<ActionSequence>();
-            _allSeq.Add(newSeq);
+            if (newSeq == null)
+            {
+                newSeq = _instance.gameObject.AddComponent<ActionSequence>();
+                _allSeq.Add(newSeq);
+            }
+
+            newSeq.onFinished += onFinish;
+            newSeq.isFnished = false;
 
             return newSeq;
+        }
+
+
+        private static void onFinish(ActionSequence seq)
+        {
+            seq.isFnished = true;
+            seq.onFinished -= onFinish;
+
+            if (!reuse)
+            {
+                _allSeq.Remove(seq);
+                Destroy(seq);
+            }
         }
     }
 }

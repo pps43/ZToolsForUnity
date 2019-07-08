@@ -7,17 +7,27 @@ using ZTools.DebugUtil;
 namespace ZTools.ActionSequence
 {
     /// <summary>
-    /// Chains some actions sequentially. 
+    /// Chains some actions sequentially ( with less coding than coroutine).
     /// 
-    /// How to use:
+    /// - How to use:
+    /// 
     /// ActionSequence seq = ActionSequenceManager.create();
     /// seq.Then(()=> dosth)).Then(doCoroutine()).Then(new WaitForSeconds(1f));
     /// seq.Run();
     /// 
-    /// Support action type:
-    /// normal function、IEnumerator、YieldInstruction、CustomYieldInstruction.
-    /// Support freature:
-    /// callback after one action finish.
+    /// - Notice:
+    /// 
+    /// You'd better **not cache** seq as class member or sth in order to reuse,
+    /// because seq's life is controlled by its manager, not you.
+    /// 
+    /// - Support action type:
+    /// 
+    /// Normal function、IEnumerator、YieldInstruction、CustomYieldInstruction.
+    /// 
+    /// - Support feature:
+    /// 
+    /// Callback after one action finish.
+    /// Nested seq.
     /// </summary>
     public class ActionSequence : MonoBehaviour
     {
@@ -83,15 +93,12 @@ namespace ZTools.ActionSequence
 
         private Queue<ActionItem> _actionSequence = new Queue<ActionItem>();
 
-        private bool _isFnished = false;//It should be regard as running just after creation
+        public bool isFnished { get; set; }//lifecycle must be controlled by ActionSequenceManager.
+
+        public event Action<ActionSequence> onFinished;
+
 
         #region public func
-
-        public bool IsRunning()
-        {
-            return !_isFnished;
-        }
-
 
         public void Run()
         {
@@ -103,6 +110,7 @@ namespace ZTools.ActionSequence
         {
             StopAllCoroutines();
             _actionSequence.Clear();
+            onFinished?.Invoke(this);
         }
 
 
@@ -206,7 +214,7 @@ namespace ZTools.ActionSequence
 
         private void Enqueue(ActionItem item)
         {
-            _isFnished = false;
+            isFnished = false;
 
             ZLog.log("[", GetInstanceID().ToString(), "] enqueue:", item.ToString());
 
@@ -253,7 +261,7 @@ namespace ZTools.ActionSequence
             }
             else
             {
-                _isFnished = true;
+                onFinished?.Invoke(this);
             }
         }
 
@@ -261,6 +269,7 @@ namespace ZTools.ActionSequence
         private void FinishOne()
         {
             //ZLog.log("finishOne, rest action =", _actionSequence.Count.ToString());
+            ZLog.log("[", GetInstanceID().ToString(), "] finishOne, rest action =", _actionSequence.Count.ToString());
 
             DoNextAction();
         }
