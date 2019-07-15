@@ -16,7 +16,7 @@ namespace ZTools.FSM
         public abstract void stop();//dispose
         public abstract void update();
 
-        protected Action<BaseFSM> disposeEvent;
+        public Action<BaseFSM> disposeEvent;
     }
 
 
