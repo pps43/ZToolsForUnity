@@ -20,13 +20,13 @@ namespace ZTools.Event
             }
         }
 
-        public bool isLocked;
+        public bool IsLocked;
         List<CommonEvent> _cachedEvents;
         Dictionary<EventID, List<EventHandlerWithID>> _allHandlers;
 
         #region singleton
         private static EventDispatcher _instance;
-        public static EventDispatcher instance
+        public static EventDispatcher Instance
         {
             get
             {
@@ -40,7 +40,7 @@ namespace ZTools.Event
 
         private EventDispatcher()
         {
-            isLocked = false;
+            IsLocked = false;
             _cachedEvents = new List<CommonEvent>();
             //EventIDComparer is used for eliminating GC caused by Enum as Key
             _allHandlers = new Dictionary<EventID, List<EventHandlerWithID>>(new EventIDComparer());
@@ -50,7 +50,7 @@ namespace ZTools.Event
             return new EventDispatcher();
         }
 
-        public static void destroyInstance()
+        public static void DestroyInstance()
         {
             _instance = null;
         }
@@ -60,7 +60,7 @@ namespace ZTools.Event
         /// <summary>
         /// register, must be paired with unregister
         /// </summary>
-        public void addListener(EventID eventID, long receiverID, EventHandler handler)
+        public void AddListener(EventID eventID, long receiverID, EventHandler handler)
         {
             if (_allHandlers.ContainsKey(eventID))
             {
@@ -77,7 +77,7 @@ namespace ZTools.Event
         /// <summary>
         /// unregister
         /// </summary>
-        public void removeListener(EventID eventID, long receiverID, EventHandler handler)
+        public void RemoveListener(EventID eventID, long receiverID, EventHandler handler)
         {
             if (_allHandlers.ContainsKey(eventID))
             {
@@ -96,7 +96,7 @@ namespace ZTools.Event
         /// <summary>
         /// will activate handler in next frame
         /// </summary>
-        public void fireEvent(EventID eventID, long senderID, long receiverID, object data)
+        public void FireEvent(EventID eventID, long senderID, long receiverID, object data)
         {
             if (senderID == -1 || receiverID == -1)
             {
@@ -110,9 +110,9 @@ namespace ZTools.Event
         /// <summary>
         /// drive by game logic
         /// </summary>
-        public void update()
+        public void Update()
         {
-            if (!isLocked)
+            if (!IsLocked)
             {
                 dispatchCachedEvent();
             }

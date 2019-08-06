@@ -21,7 +21,7 @@ namespace ZTools.Demo
         public override int TypeID => (int)_type;
 
         public float Health { get; private set; }
-        public FSM<Enemy, SelfEvent, CommonEvent> FSM { get; private set; }
+        public FSM<Enemy, LocalMsg> FSM { get; private set; }
         private EventHelper _eventHelper = new EventHelper();
 
         public override void Init()
@@ -30,22 +30,22 @@ namespace ZTools.Demo
             Health = 100f;
             _eventHelper.addListener(EventID.onTurn, OnGameTurn);
             FSM = FSMManager.instance.createFSM(this, new IdleState(), new GlobalState());
-            FSM.start();
+            FSM.Start();
         }
 
         public override void UnInit()
         {
             base.UnInit();
-            FSM.stop();
+            FSM.Stop();
         }
 
 
         #region Sense Layer, receive game event
 
         //this event comes from EventDispachter
-        private bool OnGameTurn(CommonEvent eventObj)
+        private bool OnGameTurn(CommonEvent msg)
         {
-            FSM.onMessage(eventObj);
+            FSM.OnMessage(new LocalMsg(LocalMsg.ID.onTurn));
             return false;
         }
 
@@ -53,13 +53,13 @@ namespace ZTools.Demo
         private void OnHurt()
         {
             Health -= 10f;
-            FSM.onMessage(new SelfEvent(SelfEvent.ID.onHurt));
+            FSM.OnMessage(new LocalMsg(LocalMsg.ID.onHurt));
         }
 
         //this event may from animation module
         private void OnAttackEnd()
         {
-            FSM.onMessage(new SelfEvent(SelfEvent.ID.onAttackEnd));
+            FSM.OnMessage(new LocalMsg(LocalMsg.ID.onAttackEnd));
         }
 
         #endregion

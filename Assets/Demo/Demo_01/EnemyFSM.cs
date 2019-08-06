@@ -4,21 +4,22 @@ using ZTools.FSM;
 namespace ZTools.Demo
 {
     //this shortcut is only valid in this file
-    using BaseState = BaseState<Enemy, SelfEvent, CommonEvent>;
+    using BaseState = BaseState<Enemy, LocalMsg>;
 
     //event definition. use struct to avoid GC
-    public struct SelfEvent
+    public struct LocalMsg
     {
         public enum ID
         {
             onHurt,
             onAttackEnd,
+            onTurn,
         }
 
         public ID eventID;
         public object eventData;
 
-        public SelfEvent(ID id, object data = null)
+        public LocalMsg(ID id, object data = null)
         {
             eventID = id;
             eventData = data;
@@ -41,16 +42,16 @@ namespace ZTools.Demo
 
     public class GlobalState : BaseState
     {
-        public override object OnMessage(Enemy owner, SelfEvent innerMsg)
+        public override object OnMessage(Enemy owner, LocalMsg msg)
         {
-            if (innerMsg.eventID == SelfEvent.ID.onHurt)
+            if (msg.eventID == LocalMsg.ID.onHurt)
             {
                 if(owner.Health <= 0)
                 {
-                    owner.FSM.changeState(new DeadState());
+                    owner.FSM.ChangeState(new DeadState());
                 }
             }
-            return base.OnMessage(owner, innerMsg);
+            return null;
         }
     }
 
@@ -63,15 +64,14 @@ namespace ZTools.Demo
             owner.DoIdle();
         }
 
-        //receive commonEvent
-        public override object OnMessage(Enemy owner, CommonEvent outerMsg)
+        public override object OnMessage(Enemy owner, LocalMsg msg)
         {
-            if(outerMsg.eventID == EventID.onTurn)
+            if(msg.eventID == LocalMsg.ID.onTurn)
             {
-                owner.FSM.changeState(new AttackState("someparameter"));
+                owner.FSM.ChangeState(new AttackState("someparameter"));
             }
 
-            return base.OnMessage(owner, outerMsg);
+            return null;
         }
     }
 
@@ -93,14 +93,14 @@ namespace ZTools.Demo
         }
 
         //receive selfEvent
-        public override object OnMessage(Enemy owner, SelfEvent innerMsg)
+        public override object OnMessage(Enemy owner, LocalMsg msg)
         {
-            if(innerMsg.eventID == SelfEvent.ID.onAttackEnd)
+            if(msg.eventID == LocalMsg.ID.onAttackEnd)
             {
-                owner.FSM.changeState(new IdleState());
+                owner.FSM.ChangeState(new IdleState());
             }
 
-            return base.OnMessage(owner, innerMsg);
+            return null;
         }
     }
 

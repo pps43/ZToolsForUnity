@@ -32,9 +32,9 @@ namespace ZTools.FSM
         }
 
 
-        public FSM<T, P, Q> createFSM<T, P, Q>(T owner, BaseState<T, P, Q> state, BaseState<T, P, Q> globalState) where T : class
+        public FSM<T, M> createFSM<T, M>(T owner, BaseState<T, M> state, BaseState<T, M> globalState) where T : class where M:struct 
         {
-            var newFSM = new FSM<T, P, Q>(owner, state, globalState);
+            var newFSM = new FSM<T, M>(owner, state, globalState);
 
             if (_allFSMList == null)
             {
@@ -42,7 +42,7 @@ namespace ZTools.FSM
             }
             _allFSMList.Add(newFSM);
 
-            newFSM.disposeEvent += onFSMStop;
+            newFSM.DisposeEvent += onFSMStop;
 
             return newFSM;
         }
@@ -55,9 +55,9 @@ namespace ZTools.FSM
                 idx = _allFSMList.IndexOf(fsm);
                 if (idx >= 0)
                 {
-                    fsm.disposeEvent -= onFSMStop;
+                    fsm.DisposeEvent -= onFSMStop;
 
-                    if (!fsm.isRunning)
+                    if (!fsm.IsRunning)
                     {
                         _allFSMList.RemoveAt(idx);
                     }
@@ -75,9 +75,9 @@ namespace ZTools.FSM
             {
                 for (int i = 0; i < _allFSMList.Count; i++)
                 {
-                    if (_allFSMList[i].isRunning)
+                    if (_allFSMList[i].IsRunning)
                     {
-                        _allFSMList[i].update();
+                        _allFSMList[i].Update();
                     }
                 }
             }

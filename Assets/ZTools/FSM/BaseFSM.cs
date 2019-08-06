@@ -9,136 +9,126 @@ namespace ZTools.FSM
     /// </summary>
     public abstract class BaseFSM
     {
-        public abstract bool isRunning { get; }
-        public abstract void start();
-        public abstract void pause();
-        public abstract void resume();
-        public abstract void stop();//dispose
-        public abstract void update();
+        public abstract bool IsRunning { get; protected set; }
+        public abstract void Start();
+        public abstract void Pause();
+        public abstract void Resume();
+        public abstract void Stop();//dispose
+        public abstract void Update();
 
-        public Action<BaseFSM> disposeEvent;
+        public Action<BaseFSM> DisposeEvent;
     }
 
 
     /// <summary>
     /// FSM (Finite state machine)
     /// 
-    /// Provide two type of msg: P, Q. This is commonly defined as local msgtype as P,
-    /// common msgtype as Q. This is to reduce global msgType contamination.
+    /// T is FSM's owner's type.
+    /// M is custom msg type.
     /// 
-    /// Change state is done immediately rather than next frame to keep simplicity and robustness.
+    /// Change state immediately rather than next frame to keep simplicity and robustness.
     /// 
     /// Notice that one state may not call update() if time interval between enter() and exit() is less than one frame interval.
     /// 
     /// All onMessage function return an object.
-    /// This is useful when you want to get some data immediately.
+    /// This is useful when you want to get some data/response immediately.
+    /// 
+    /// _globalState is a state that receive msg at anytime.
+    /// This is very useful when all your states need to respond the same msg.
+    /// E.g. when HP less than 0, die whatever state.
     /// 
     /// -----Example code----
     /// fsm = FSMFactory.createFSM(owner, new IdleState(), new GlobalState());
     /// fsm.start();
-    /// fsm.onMessage(new TypePEvent());
-    /// fsm.onMessage(new TypeQEvent());
+    /// fsm.onMessage(new YourMsgStruct());
     /// fsm.stop();
     /// 
     /// </summary>
-    public class FSM<T, P, Q> : BaseFSM where T : class
+    public class FSM<T, M> : BaseFSM where T : class where M : struct
     {
+        public override bool IsRunning { get; protected set; }
+
         private T _owner;
-        private BaseState<T, P, Q> _curState;//current state
-        private BaseState<T, P, Q> _lastSate;//previous state
-        private BaseState<T, P, Q> _globalState;//logic for all state
-
-        public override bool isRunning => _isRunning;
-        private bool _isRunning;
+        private BaseState<T, M> _curState;//current state
+        private BaseState<T, M> _lastSate;//previous state
+        private BaseState<T, M> _globalState;//logic for all state
 
 
-        public FSM(T owner, BaseState<T, P, Q> state, BaseState<T, P, Q> globalState)
+        public FSM(T owner, BaseState<T, M> state, BaseState<T, M> globalState)
         {
-            _isRunning = false;
+            IsRunning = false;
             _owner = owner;
             _lastSate = state;
             _curState = state;
             _globalState = globalState;
         }
 
-        public override void start()
+
+        public override void Start()
         {
-            if (!_isRunning)
+            if (!IsRunning)
             {
-                _isRunning = true;
+                IsRunning = true;
                 _curState.Enter(_owner, null);
             }
         }
 
-        public override void pause()
+
+        public override void Pause()
         {
-            _isRunning = false;
+            IsRunning = false;
         }
 
-        public override void resume()
+
+        public override void Resume()
         {
-            _isRunning = true;
+            IsRunning = true;
         }
 
-        public override void stop()
+
+        public override void Stop()
         {
-            if (_isRunning)
+            if (IsRunning)
             {
                 _curState.Exit(_owner);
-                _isRunning = false;
-                disposeEvent?.Invoke(this);
+                IsRunning = false;
+                DisposeEvent?.Invoke(this);
             }
         }
 
-        public override void update()
+
+        public override void Update()
         {
-            if (_isRunning)
+            if (IsRunning)
             {
                 if (_curState != null) { _curState.Update(_owner); }
                 if (_globalState != null) { _globalState.Update(_owner); }
             }
         }
 
+
         /// <summary>
-        /// dispatch a message of type P to fsm and get a return msg.
+        /// dispatch a message to fsm and get a return msg.
         /// </summary>
-        /// <param name="innerMsg"></param>
-        /// <param name="retFromGlobal"></param>
-        /// <returns></returns>
-        public object onMessage(P innerMsg, bool retFromGlobal = false)
+        public object OnMessage(M msg, bool retFromGlobal = false)
         {
             object msgRet = null;
             object msgRetGlobal = null;
-            if (_isRunning)
+            if (IsRunning)
             {
-                if (_curState != null) { msgRet = _curState.OnMessage(_owner, innerMsg); }
-                if (_globalState != null) { msgRetGlobal = _globalState.OnMessage(_owner, innerMsg); }
+                if (_curState != null) { msgRet = _curState.OnMessage(_owner, msg); }
+                if (_globalState != null) { msgRetGlobal = _globalState.OnMessage(_owner, msg); }
             }
             return retFromGlobal ? msgRetGlobal : msgRet;
         }
 
 
         /// <summary>
-        /// dispatch a message of type Q to fsm and get a return msg.
+        /// change state immediately with some data
         /// </summary>
-        /// <param name="outerMsg"></param>
-        /// <param name="retFromGlobal"></param>
-        /// <returns></returns>
-        public object onMessage(Q outerMsg, bool retFromGlobal = false)
+        public void ChangeState(BaseState<T, M> newState, object param = null)
         {
-            object msgRet = null;
-            object msgRetGlobal = null;
-            if (_isRunning)
-            {
-                if (_curState != null) { msgRet = _curState.OnMessage(_owner, outerMsg); }
-                if (_globalState != null) { msgRetGlobal = _globalState.OnMessage(_owner, outerMsg); }
-            }
-            return retFromGlobal ? msgRetGlobal : msgRet;
-        }
-
-        private void changeState(BaseState<T, P, Q> newState, object param = null)
-        {
-            if (!isRunning)
+            if (!IsRunning)
             {
                 ZLog.error("Cannot change state, FSM is not runnning");
                 return;
@@ -176,21 +166,27 @@ namespace ZTools.FSM
             _curState.Enter(_owner, param);
         }
 
-        public void revertState()
+
+        /// <summary>
+        /// go back to previous state
+        /// </summary>
+        public void RevertState()
         {
-            if (_isRunning)
+            if (IsRunning)
             {
                 //TODO，support revert state that requires param
-                changeState(_lastSate);
+                ChangeState(_lastSate);
             }
         }
 
-        public bool isInState(Type type)
+
+        public bool IsInState(Type type)
         {
             return _curState.GetType().Equals(type);
         }
 
-        public string getStateName()
+
+        public string GetStateName()
         {
             return _curState.GetType().Name;
         }

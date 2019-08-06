@@ -20,7 +20,7 @@ namespace ZTools.Game
         public CollisionManager collisionManager { get; private set; }
 
         private EventHelper _eventHelper;
-        public FSM<GamePlay, NoEvent, CommonEvent> fsm { get; private set; }
+        public FSM<GamePlay, CommonEvent> fsm { get; private set; }
 
         private void Awake()
         {
@@ -30,12 +30,12 @@ namespace ZTools.Game
         private void Start()
         {
             //fsm = FSMFactory.createFSM(this, new InitialState(), null);
-            fsm.start();
+            fsm.Start();
         }
 
         private void Update()
         {
-            eventDispatcher.update();
+            eventDispatcher.Update();
         }
 
 
@@ -43,7 +43,7 @@ namespace ZTools.Game
         {
             //get managers
 
-            eventDispatcher = EventDispatcher.instance;
+            eventDispatcher = EventDispatcher.Instance;
 
             _eventHelper = new EventHelper();
             //add listener
@@ -51,7 +51,7 @@ namespace ZTools.Game
 
         public void UnInitGamePlay()
         {
-            fsm.stop(); fsm = null;
+            fsm.Stop(); fsm = null;
 
             //remove listener
 

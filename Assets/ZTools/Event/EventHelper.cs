@@ -27,7 +27,7 @@ namespace ZTools.Event
         /// </summary>
         public void fireEvent(EventID eventID, object data = null, long receiverID = ReceiverIDAllocator.GLOBALID)
         {
-            EventDispatcher.instance.fireEvent(eventID, ID, receiverID, data);
+            EventDispatcher.Instance.FireEvent(eventID, ID, receiverID, data);
         }
 
 
@@ -40,7 +40,7 @@ namespace ZTools.Event
             else
             {
                 registeredListener.Add(eventID, handler);
-                EventDispatcher.instance.addListener(eventID, ID, handler);
+                EventDispatcher.Instance.AddListener(eventID, ID, handler);
             }
         }
 
@@ -49,7 +49,7 @@ namespace ZTools.Event
             if (registeredListener.ContainsKey(eventID))
             {
                 registeredListener.Remove(eventID);
-                EventDispatcher.instance.removeListener(eventID, ID, handler);
+                EventDispatcher.Instance.RemoveListener(eventID, ID, handler);
             }
             else
             {

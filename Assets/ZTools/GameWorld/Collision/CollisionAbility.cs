@@ -181,6 +181,8 @@ namespace ZTools.Game.CollisionUtil
                 OnGameCollisionEnter?.Invoke(other);
             }
         }
+
+
         private void ProcessCollisionExit(CollisionAbility other)
         {
             if(CanCollideWith(other))
@@ -188,6 +190,7 @@ namespace ZTools.Game.CollisionUtil
                 OnGameCollisionExit?.Invoke(other);
             }
         }
+
 
         private bool CanCollideWith(CollisionAbility other)
         {
