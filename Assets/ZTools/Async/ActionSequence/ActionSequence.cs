@@ -93,9 +93,9 @@ namespace ZTools.ActionSequence
 
         private Queue<ActionItem> _actionSequence = new Queue<ActionItem>();
 
-        public bool isFnished { get; set; }//lifecycle must be controlled by ActionSequenceManager.
+        public bool IsFinshed { get; set; }//lifecycle must be controlled by ActionSequenceManager.
 
-        public event Action<ActionSequence> onFinished;
+        public event Action<ActionSequence> OnFinished;
 
 
         #region public func
@@ -110,7 +110,7 @@ namespace ZTools.ActionSequence
         {
             StopAllCoroutines();
             _actionSequence.Clear();
-            onFinished?.Invoke(this);
+            OnFinished?.Invoke(this);
         }
 
 
@@ -181,7 +181,7 @@ namespace ZTools.ActionSequence
             {
                 ActionItem item = new ActionItem
                 {
-                    name = func.ToString() + "with param",
+                    name = $"{func.ToString()} with param",
                     funcWithParam = func,
                     param = param1,
                 };
@@ -197,7 +197,7 @@ namespace ZTools.ActionSequence
             {
                 ActionItem item = new ActionItem
                 {
-                    name = func.ToString() + "with param & callback",
+                    name = $"{func.ToString()} with param & callback",
                     funcWithParamAndCallBack = func,
                     func = myCallBack,
                     param = param,
@@ -214,9 +214,9 @@ namespace ZTools.ActionSequence
 
         private void Enqueue(ActionItem item)
         {
-            isFnished = false;
+            IsFinshed = false;
 
-            ZLog.log("[", GetInstanceID().ToString(), "] enqueue:", item.ToString());
+            ZLog.log($"[{GetInstanceID().ToString()}] dequeue:{item.ToString()}");
 
             _actionSequence.Enqueue(item);
         }
@@ -229,39 +229,48 @@ namespace ZTools.ActionSequence
                 ActionItem item = _actionSequence.Peek();
                 _actionSequence.Dequeue();
 
-                ZLog.log("[", GetInstanceID().ToString(), "] dequeue:", item.ToString());
+                ZLog.log($"[{GetInstanceID().ToString()}] dequeue:{item.ToString()}");
 
-                if (item.funcWithParamAndCallBack != null)
+                // exceptions may raise, but ActionSequence should keep operating.
+                try
                 {
-                    item.funcWithParamAndCallBack(item.param, item.func);
-                    FinishOne();
+                    if (item.funcWithParamAndCallBack != null)
+                    {
+                        item.funcWithParamAndCallBack(item.param, item.func);
+                        FinishOne();
+                    }
+                    else if (item.funcWithParam != null)
+                    {
+                        item.funcWithParam(item.param);
+                        FinishOne();
+                    }
+                    else if (item.func != null)
+                    {
+                        item.func();
+                        FinishOne();
+                    }
+                    else if (item.coroutine != null)
+                    {
+                        StartCoroutine(DoItemCoroutine(item));
+                    }
+                    else if (item.yieldInstruction != null)
+                    {
+                        StartCoroutine(DoItemYieldInstruction(item));
+                    }
+                    else if (item.customYield != null)
+                    {
+                        StartCoroutine(DoItemCustomYieldInstruction(item));
+                    }
                 }
-                else if (item.funcWithParam != null)
+                catch(Exception e)
                 {
-                    item.funcWithParam(item.param);
-                    FinishOne();
-                }
-                else if (item.func != null)
-                {
-                    item.func();
-                    FinishOne();
-                }
-                else if (item.coroutine != null)
-                {
-                    StartCoroutine(doItemCoroutine(item));
-                }
-                else if (item.yieldInstruction != null)
-                {
-                    StartCoroutine(doItemYieldInstruction(item));
-                }
-                else if (item.customYield != null)
-                {
-                    StartCoroutine(doItemCustomYieldInstruction(item));
+                    ZLog.warn(e.ToString());
+                    OnFinished?.Invoke(this);
                 }
             }
             else
             {
-                onFinished?.Invoke(this);
+                OnFinished?.Invoke(this);
             }
         }
 
@@ -269,27 +278,27 @@ namespace ZTools.ActionSequence
         private void FinishOne()
         {
             //ZLog.log("finishOne, rest action =", _actionSequence.Count.ToString());
-            ZLog.log("[", GetInstanceID().ToString(), "] finishOne, rest action =", _actionSequence.Count.ToString());
+            ZLog.log($"[{GetInstanceID().ToString()}] finishOne, rest action = { _actionSequence.Count.ToString()}");
 
             DoNextAction();
         }
 
 
-        private IEnumerator doItemCoroutine(ActionItem item)
+        private IEnumerator DoItemCoroutine(ActionItem item)
         {
             yield return item.coroutine;
             FinishOne();
         }
 
 
-        private IEnumerator doItemYieldInstruction(ActionItem item)
+        private IEnumerator DoItemYieldInstruction(ActionItem item)
         {
             yield return item.yieldInstruction;
             FinishOne();
         }
 
 
-        private IEnumerator doItemCustomYieldInstruction(ActionItem item)
+        private IEnumerator DoItemCustomYieldInstruction(ActionItem item)
         {
             yield return item.customYield;
             FinishOne();

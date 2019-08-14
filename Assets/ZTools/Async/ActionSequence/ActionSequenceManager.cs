@@ -34,7 +34,7 @@ namespace ZTools.ActionSequence
             {
                 for (int i = 0; i < _allSeq.Count; i++)
                 {
-                    if (_allSeq[i].isFnished)
+                    if (_allSeq[i].IsFinshed)
                     {
                         newSeq = _allSeq[i];
                         break;
@@ -48,8 +48,8 @@ namespace ZTools.ActionSequence
                 _allSeq.Add(newSeq);
             }
 
-            newSeq.onFinished += onFinish;
-            newSeq.isFnished = false;
+            newSeq.OnFinished += onFinish;
+            newSeq.IsFinshed = false;
 
             return newSeq;
         }
@@ -57,8 +57,8 @@ namespace ZTools.ActionSequence
 
         private static void onFinish(ActionSequence seq)
         {
-            seq.isFnished = true;
-            seq.onFinished -= onFinish;
+            seq.IsFinshed = true;
+            seq.OnFinished -= onFinish;
 
             if (!reuse)
             {
