@@ -1,12 +1,46 @@
 ﻿using UnityEngine;
 namespace ZTools.MathUtil
 {
-    public class MathUtil : MonoBehaviour
+    public class MathUtil
     {
+
+        #region Mapping
+
+        /// <summary>
+        /// Generate a unique number from 2 numbers.
+        /// This method is better than famous Cantor's method.
+        /// http://szudzik.com/ElegantPairing.pdf
+        /// </summary>
+        public static uint PairTwoNumber(uint a, uint b)
+        {
+            uint x = 0;
+            try
+            {
+                checked
+                {
+                    if (a > b)
+                    {
+                        x = a * a + a + b;
+                    }
+                    else
+                    {
+                        x = b * b + a;
+                    }
+                }
+            }
+            catch (System.OverflowException e)
+            {
+                Debug.LogError(e.ToString());
+            }
+            return x;
+        }
+
+        #endregion
+
         #region Random
         public static bool RandomBool()
         {
-            return Random.value > 0.5f;
+            return UnityEngine.Random.value > 0.5f;
         }
         #endregion
 
