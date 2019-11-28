@@ -115,7 +115,7 @@ namespace ZTools.Game.CollisionUtil
                 CollisionAbility ca = other.gameObject.GetComponent<CollisionAbility>();
                 ProcessCollisionEnter(ca);
             }
-            
+
         }
         private void OnTriggerEnter2D(Collider2D other)
         {
@@ -185,7 +185,7 @@ namespace ZTools.Game.CollisionUtil
 
         private void ProcessCollisionExit(CollisionAbility other)
         {
-            if(CanCollideWith(other))
+            if (CanCollideWith(other))
             {
                 OnGameCollisionExit?.Invoke(other);
             }
@@ -201,21 +201,21 @@ namespace ZTools.Game.CollisionUtil
 
             if (passTypeTest)
             {
-                bool passExclusiveTest = UseExclusiveTest?
-                    GamePlay.instance.collisionManager.CanPassExclusiveTest(this, other): true;
+                bool passExclusiveTest = UseExclusiveTest ?
+                    GamePlay.instance.collisionManager.CanPassExclusiveTest(this, other) : true;
 
-                if(passExclusiveTest)
+                if (passExclusiveTest)
                 {
                     return true;
                 }
                 else
                 {
-                    ZLog.verbose(owner.name, "fails Exclusive Test with:", other.owner.name);
+                    ZLog.log(owner.name, "fails Exclusive Test with:", other.owner.name);
                 }
             }
             else
             {
-                ZLog.verbose(owner.name, "fails Type Test with type:", other.Type.ToString());
+                ZLog.log(owner.name, "fails Type Test with type:", other.Type);
             }
             return false;
         }

@@ -136,18 +136,18 @@ namespace ZTools.FSM
 
             if (newState == null)
             {
-                ZLog.error(_owner.ToString(), "cannot change state to null");
+                ZLog.error(_owner, "cannot change state to null");
                 return;
             }
             if (_lastSate == null || _curState == null)
             {
-                ZLog.error(_owner.ToString(), "Fatal error: _lastSate || _curState = null, newState=", newState.ToString());
+                ZLog.error(_owner, "Fatal error: _lastSate || _curState = null, newState=", newState);
                 return;
             }
 
             if (newState.GetType().Equals(_curState.GetType()))
             {
-                ZLog.warn(_owner.ToString(), "cannot change to the same state:", _curState.ToString());
+                ZLog.warn(_owner, "cannot change to the same state:", _curState);
                 return;
             }
 
@@ -160,7 +160,7 @@ namespace ZTools.FSM
             _lastSate = _curState;
             _curState = newState;
 
-            ZLog.verbose(_owner.ToString() + ": " + _lastSate.ToString() + " -> " + _curState.ToString());
+            ZLog.log(_owner, _lastSate, _curState);
 
             _lastSate.Exit(_owner);
             _curState.Enter(_owner, param);

@@ -18,7 +18,7 @@ namespace ZTools.DebugUtil
     {
         public static bool isLogOn = true; // swith on/off
         public static LogLevel logLevel = LogLevel.info;
-        private static int _line = 176;// Must be the line number of "UnityEngine.Debug.Log" in this file.
+        private static int _line = 148;// Must be the line number of "UnityEngine.Debug.Log" in this file.
         private static string _filePath = "Assets/ZTools/Debug/Log/LogUtil.cs";//Modify to your actual path
         public enum LogLevel
         {
@@ -33,100 +33,73 @@ namespace ZTools.DebugUtil
         private const string ERROR_COLOR = "red";
         private static StringBuilder _sb = new StringBuilder();
 
-        /// <summary>
-        /// Helps to concate strings
-        /// </summary>
-        /// <param name="msg"></param>
-        /// <returns></returns>
-        public static string str(params string[] msg)
+
+        public static void log<T>(T msg)
         {
+            if (!isLogOn) { return; }
+            logFormat(LogLevel.info, msg.ToString());
+        }
+
+        public static void log<T1, T2>(T1 m1, T2 m2)
+        {
+            if (!isLogOn) { return; }
             _sb.Length = 0;
-            for (int i = 0; i < msg.Length; i++)
-            {
-                _sb.Append(msg[i]).Append(" ");
-            }
-            return _sb.ToString();
+            _sb.Append(m1).Append(m2);
+            logFormat(LogLevel.info, _sb.ToString());
         }
 
-        public static void log(string msg)
+        public static void log<T1, T2, T3>(T1 m1, T2 m2, T3 m3)
         {
-            if (isLogOn)
-            {
-                logFormat(LogLevel.info, msg);
-            }
-        }
-        public static void log(params string[] msg) //todo params 会创建数组有开销。多加几个重载吧
-        {
-            if (isLogOn)
-            {
-                _sb.Length = 0;
-                for (int i = 0; i < msg.Length; i++)
-                {
-                    _sb.Append(msg[i]).Append(" ");
-                }
-                logFormat(LogLevel.info, _sb.ToString());
-            }
+            if (!isLogOn) { return; }
+            _sb.Length = 0;
+            _sb.Append(m1).Append(m2).Append(m3);
+            logFormat(LogLevel.info, _sb.ToString());
         }
 
-        public static void warn(string msg)
+        public static void warn<T>(T msg)
         {
-            if (isLogOn)
-            {
-                logFormat(LogLevel.warning, msg);
-            }
-        }
-        public static void warn(params string[] msg) //TODO "params" has overhead
-        {
-            if (isLogOn)
-            {
-                _sb.Length = 0;
-                for (int i = 0; i < msg.Length; i++)
-                {
-                    _sb.Append(msg[i]).Append(" ");
-                }
-                logFormat(LogLevel.warning, _sb.ToString());
-            }
+            if (!isLogOn) { return; }
+            logFormat(LogLevel.warning, msg.ToString());
         }
 
-        public static void error(string msg)
+        public static void warn<T1, T2>(T1 m1, T2 m2)
         {
-            if (isLogOn)
-            {
-                logFormat(LogLevel.error, msg);
-            }
-        }
-        public static void error(params string[] msg) //TODO "params" has overhead
-        {
-            if (isLogOn)
-            {
-                _sb.Length = 0;
-                for (int i = 0; i < msg.Length; i++)
-                {
-                    _sb.Append(msg[i]).Append(" ");
-                }
-                logFormat(LogLevel.error, _sb.ToString());
-            }
+            if (!isLogOn) { return; }
+            _sb.Length = 0;
+            _sb.Append(m1).Append(m2);
+            logFormat(LogLevel.warning, _sb.ToString());
         }
 
-        public static void verbose(string msg)
+        public static void warn<T1, T2, T3>(T1 m1, T2 m2, T3 m3)
         {
-            if (isLogOn)
-            {
-                logFormat(LogLevel.verbose, msg);
-            }
+            if (!isLogOn) { return; }
+            _sb.Length = 0;
+            _sb.Append(m1).Append(m2).Append(m3);
+            logFormat(LogLevel.warning, _sb.ToString());
         }
-        public static void verbose(params string[] msg) //TODO "params" has overhead
+
+        public static void error<T>(T msg)
         {
-            if (isLogOn)
-            {
-                _sb.Length = 0;
-                for (int i = 0; i < msg.Length; i++)
-                {
-                    _sb.Append(msg[i]).Append(" ");
-                }
-                logFormat(LogLevel.verbose, _sb.ToString());
-            }
+            if (!isLogOn) { return; }
+            logFormat(LogLevel.error, msg.ToString());
         }
+
+        public static void error<T1, T2>(T1 m1, T2 m2)
+        {
+            if (!isLogOn) { return; }
+            _sb.Length = 0;
+            _sb.Append(m1).Append(m2);
+            logFormat(LogLevel.error, _sb.ToString());
+        }
+
+        public static void error<T1, T2, T3>(T1 m1, T2 m2, T3 m3)
+        {
+            if (!isLogOn) { return; }
+            _sb.Length = 0;
+            _sb.Append(m1).Append(m2).Append(m3);
+            logFormat(LogLevel.error, _sb.ToString());
+        }
+
 
         public static void assert(bool condition, string msg = "")
         {
@@ -139,7 +112,6 @@ namespace ZTools.DebugUtil
                 UnityEngine.Debug.Assert(condition, msg);
             }
         }
-
 
         private static void logFormat(LogLevel level, string msg)
         {
@@ -277,7 +249,7 @@ namespace ZTools.DebugUtil
         {
             //"xxx.cs",
             //"yyy.cs",
-            
+
         };
     }
 }
