@@ -2,64 +2,47 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ZTools.DebugUtil;
+using ZTools.Game.Singleton;
 
 namespace ZTools.FSM
 {
     /// <summary>
     /// create and drive FSM
     /// </summary>
-    public class FSMManager : MonoBehaviour
+    public class FSMManager : USingleton<FSMManager>
     {
-        private List<BaseFSM> _allFSMList = null;
-
-        private static FSMManager _ins;
-        public static FSMManager instance
-        {
-            get
-            {
-                if (_ins == null)
-                {
-                    GameObject obj = GameObject.Find("FSMManager");
-                    if (obj == null)
-                    {
-                        obj = new GameObject("FSMManager");
-                    }
-                    _ins = obj.AddComponent<FSMManager>();
-                    DontDestroyOnLoad(obj);
-                }
-                return _ins;
-            }
-        }
-
+        private List<IFSM> allFSMs = null;
 
         public FSM<T, M> createFSM<T, M>(T owner, BaseState<T, M> state, BaseState<T, M> globalState) where T : class where M:struct 
         {
             var newFSM = new FSM<T, M>(owner, state, globalState);
 
-            if (_allFSMList == null)
+            if (this.allFSMs == null)
             {
-                _allFSMList = new List<BaseFSM>();
+                this.allFSMs = new List<IFSM>();
             }
-            _allFSMList.Add(newFSM);
 
-            newFSM.DisposeEvent += onFSMStop;
+            this.allFSMs.Add(newFSM);
+
+            newFSM.OnSelfDispose += onFSMStop;
 
             return newFSM;
         }
 
-        private void onFSMStop(BaseFSM fsm)
+        private void onFSMStop(IFSM fsm)
         {
             int idx = -1;
-            if (_allFSMList != null && fsm != null)
+
+            if (this.allFSMs != null && fsm != null)
             {
-                idx = _allFSMList.IndexOf(fsm);
+                idx = this.allFSMs.IndexOf(fsm);
                 if (idx >= 0)
                 {
-                    fsm.DisposeEvent -= onFSMStop;
+                    fsm.OnSelfDispose -= onFSMStop;
 
                     if (!fsm.IsRunning)
                     {
-                        _allFSMList.RemoveAt(idx);
+                        this.allFSMs.RemoveAt(idx);
                     }
                     else
                     {
@@ -71,17 +54,18 @@ namespace ZTools.FSM
 
         private void LateUpdate()
         {
-            if (_allFSMList != null)
+            if (this.allFSMs == null)
             {
-                for (int i = 0; i < _allFSMList.Count; i++)
+                return;
+            }
+
+            foreach (var fsm in this.allFSMs)
+            {
+                if(fsm.IsRunning)
                 {
-                    if (_allFSMList[i].IsRunning)
-                    {
-                        _allFSMList[i].Update();
-                    }
+                    fsm.Update();
                 }
             }
         }
-
     }
 }

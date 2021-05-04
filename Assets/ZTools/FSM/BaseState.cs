@@ -3,7 +3,7 @@
     /// <summary>
     /// base class for state, used in FSM (Finite state machine)
     /// </summary>
-    public abstract class BaseState<T, M>
+    public abstract class BaseState<T, M> where T : class where M : struct
     {
         public virtual object OnMessage(T owner, M msg) { return null; }
 
@@ -15,7 +15,7 @@
 
         public override string ToString()
         {
-            return GetType().Name;
+            return this.GetType().Name;
         }
     }
 
