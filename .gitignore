@@ -4,4 +4,6 @@ Temp/
 *.sln
 .vs/
 obj/
+Logs/
 .vscode/settings.json
+UpgradeLog.htm
