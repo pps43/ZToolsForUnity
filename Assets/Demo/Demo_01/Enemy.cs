@@ -29,7 +29,7 @@ namespace ZTools.Demo
             base.Init();
             Health = 100f;
             _eventHelper.addListener(EventID.onTurn, OnGameTurn);
-            FSM = FSMManager.instance.createFSM(this, new IdleState(), new GlobalState());
+            FSM = FSMManager.Instance.createFSM(this, new IdleState(), new GlobalState());
             FSM.Start();
         }
 
