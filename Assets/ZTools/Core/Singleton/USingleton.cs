@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ZTools.Game.Singleton
+namespace ZTools.Core
 {
     public abstract class USingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
