@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace ZTools.DebugUtil
+namespace ZTools.Debug
 {
     /// <summary>
     /// Analysis overdraw when play.

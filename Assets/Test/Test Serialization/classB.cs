@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class classB : MonoBehaviour
+namespace ZTools.Test
 {
-    private void Awake()
+    public class classB : MonoBehaviour
     {
+        private void Awake()
+        {
+        }
     }
-    
 }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace ZTools.DebugUtil
+namespace ZTools.Debug
 {
     /// <summary>
     /// To display framerate, attach Text or TextMesh compnent to this script

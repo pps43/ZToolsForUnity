@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-namespace ZTools.EditorUtil.Demo
+namespace ZTools.Editor.Demo
 {
     public enum ColliderType
     {
@@ -46,7 +46,7 @@ namespace ZTools.EditorUtil.Demo
 
         public void resetCorrespondType()
         {
-            Debug.Log(gameObject.name + ", resetCollisionFrom. selfType:" +  _selfType.ToString());
+            UnityEngine.Debug.Log(gameObject.name + ", resetCollisionFrom. selfType:" +  _selfType.ToString());
             resetCorrespondType(_selfType);
         }
 

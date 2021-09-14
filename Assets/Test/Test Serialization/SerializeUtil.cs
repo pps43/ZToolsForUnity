@@ -4,42 +4,45 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public class SerializeUtil : MonoBehaviour
+namespace ZTools.Test
 {
-    public classA obj;
-
-    public string relativePath = "/classAData.bytes";
-
-    public bool useJson = false;
-
-    public void save()
+    public class SerializeUtil : MonoBehaviour
     {
-        FileStream stream = new FileStream(Application.persistentDataPath + relativePath, FileMode.Create);
+        public classA obj;
 
-        BinaryFormatter formatter = new BinaryFormatter();
-        formatter.Serialize(stream, new classA.SerializedClassA(obj));
+        public string relativePath = "/classAData.bytes";
 
-        stream.Close();
-        
-    }
+        public bool useJson = false;
 
-    public void load()
-    {
-        string path = Application.persistentDataPath + relativePath;
-        if(File.Exists(path))
+        public void save()
         {
-            BinaryFormatter formatter = new BinaryFormatter();
-            FileStream stream = new FileStream(path, FileMode.Open);
+            FileStream stream = new FileStream(Application.persistentDataPath + relativePath, FileMode.Create);
 
-            classA.SerializedClassA data = formatter.Deserialize(stream) as classA.SerializedClassA;
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(stream, new classA.SerializedClassA(obj));
 
             stream.Close();
-
-            data.deserialize(obj);
+        
         }
-        else
+
+        public void load()
         {
-            Debug.LogError("file not exist on:" + path);
+            string path = Application.persistentDataPath + relativePath;
+            if(File.Exists(path))
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                FileStream stream = new FileStream(path, FileMode.Open);
+
+                classA.SerializedClassA data = formatter.Deserialize(stream) as classA.SerializedClassA;
+
+                stream.Close();
+
+                data.deserialize(obj);
+            }
+            else
+            {
+                Debug.LogError("file not exist on:" + path);
+            }
         }
     }
 }

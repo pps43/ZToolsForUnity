@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-namespace ZTools.DebugUtil
+namespace ZTools.Debug
 {
     /// <summary>
     /// draw gizmos with color

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-namespace ZTools.EditorUtil.CustomAttribute
+namespace ZTools.Editor
 {
     /// <summary>
     /// Select layer in your script

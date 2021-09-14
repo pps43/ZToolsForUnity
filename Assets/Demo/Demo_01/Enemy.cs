@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ZTools.Event;
-using ZTools.FSM;
+using ZTools.Core;
 using ZTools.Game;
-using ZTools.EditorUtil.CustomAttribute;
+using ZTools.Editor.CustomAttribute;
 namespace ZTools.Demo
 {
     public enum EnemyType

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-namespace ZTools.EditorUtil.CustomAttribute
+namespace ZTools.Editor
 {
 
     [CustomPropertyDrawer(typeof(ShowLayerAttribute))]

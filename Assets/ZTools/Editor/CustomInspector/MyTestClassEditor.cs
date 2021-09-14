@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using ZTools.EditorUtil.Demo;
+using ZTools.Editor.Demo;
 
-namespace ZTools.EditorUtil.CustomInspector
+namespace ZTools.Editor.CustomInspector
 {
     //show MyTestClass._selfType, and show diffrent _correspondType according to _selfType's value
     [CustomEditor(typeof(MyTestClass))]
-    public class CollisionJudgeAbilityEditor: Editor
+    public class CollisionJudgeAbilityEditor: UnityEditor.Editor
     {
         SerializedProperty selfType;
         SerializedProperty correspondTypes;
