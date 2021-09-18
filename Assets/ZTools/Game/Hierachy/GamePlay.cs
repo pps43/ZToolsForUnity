@@ -13,13 +13,11 @@ namespace ZTools.Game
         public static GamePlay instance;
 
         //public InputManager inputManager { get; private set; }
-        public EventDispatcher eventDispatcher { get; private set; }
         //public LevelManager levelManager { get; private set; }
         //public EnemyManager enemyManager { get; private set; }
         public CollisionManager collisionManager { get; private set; }
 
-        private EventHelper _eventHelper;
-        public FSM<GamePlay, CommonEvent> fsm { get; private set; }
+        public FSM<GamePlay, object> fsm { get; private set; }
 
         private void Awake()
         {
@@ -32,19 +30,11 @@ namespace ZTools.Game
             fsm.Start();
         }
 
-        private void Update()
-        {
-            eventDispatcher.Update();
-        }
-
-
         public void InitGamePlay()
         {
             //get managers
 
-            eventDispatcher = EventDispatcher.Instance;
 
-            _eventHelper = new EventHelper();
             //add listener
         }
 

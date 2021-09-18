@@ -41,11 +41,11 @@ namespace ZTools.Core
     /// -----Example code----
     /// fsm = FSMFactory.createFSM(owner, new IdleState(), new GlobalState());
     /// fsm.start();
-    /// fsm.onMessage(new YourMsgStruct());
+    /// fsm.onMessage(new YourMsgType());
     /// fsm.stop();
     /// 
     /// </summary>
-    public class FSM<T, M> : IFSM where T : class where M : struct
+    public class FSM<T, M> : IFSM where T : class
     {
         public bool IsRunning { get; set; }
 
