@@ -21,15 +21,22 @@ namespace ZTools.Demo
 
         public float Health { get; private set; }
         public FSM<Enemy, LocalMsg> FSM { get; private set; }
-        private EventHelper _eventHelper = new EventHelper();
 
         public override void Init()
         {
             base.Init();
             Health = 100f;
-            _eventHelper.addListener(EventID.onTurn, OnGameTurn);
+            Singleton<EventDispatcher<EventID,EventData>>.Instance.AddListener(EventID.OnDamage, OnDamageHandler);
             FSM = FSMManager.Instance.createFSM(this, new IdleState(), new GlobalState());
             FSM.Start();
+        }
+
+        private void OnDamageHandler(EventData data)
+        {
+            if (data is DamageData msg)
+            {
+                
+            }
         }
 
         public override void UnInit()
@@ -40,13 +47,7 @@ namespace ZTools.Demo
 
 
         #region Sense Layer, receive game event
-
-        //this event comes from EventDispachter
-        private bool OnGameTurn(CommonEvent msg)
-        {
-            FSM.OnMessage(new LocalMsg(LocalMsg.ID.onTurn));
-            return false;
-        }
+        
 
         //this event may from collision module
         private void OnHurt()
